@@ -166,6 +166,7 @@
       background: var(--white); border-radius: 20px; padding: 2.5rem;
       border: 1px solid rgba(15,27,61,0.08);
       transition: transform 0.2s;
+      display: flex; flex-direction: column;
     }
     .price-card:hover { transform: translateY(-4px); }
     .price-card.featured {
@@ -180,7 +181,7 @@
     .price-card ul li { padding: 0.4rem 0; font-size: 0.95rem; }
     .price-card ul li::before { content: '→ '; color: var(--teal); font-weight: 700; }
     .price-card.featured p, .price-card.featured ul li { color: rgba(255,255,255,0.7); }
-    .price-card .btn { width: 100%; text-align: center; }
+    .price-card .btn { width: 100%; text-align: center; margin-top: auto; }
 
     /* FOOTER */
     footer {
