@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klyvra — Sovereign Productivity Suite</title>
+  <link rel="icon" href="assets/logo_icon.png" type="image/png">
+  <style>
+    :root {
+      --teal: #3ECDA5;
+      --blue: #2B5CE6;
+      --navy: #0F1B3D;
+      --dark: #080E1F;
+      --light: #F4F7FB;
+      --gray: #8892A4;
+      --white: #FFFFFF;
+      --gradient: linear-gradient(135deg, var(--teal), var(--blue));
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,27,61,0.08);
+      padding: 0.8rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    nav .logo img { height: 36px; }
+    nav .links { display: flex; gap: 2rem; align-items: center; }
+    nav .links a {
+      text-decoration: none; color: var(--navy); font-size: 0.95rem;
+      font-weight: 500; opacity: 0.8; transition: opacity 0.2s;
+    }
+    nav .links a:hover { opacity: 1; }
+    .btn {
+      display: inline-block; padding: 0.6rem 1.5rem; border-radius: 8px;
+      text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(43,92,230,0.3); }
+    .btn-primary { background: var(--gradient); color: var(--white); }
+    .btn-outline { border: 2px solid var(--blue); color: var(--blue); }
+    .btn-outline:hover { background: var(--blue); color: var(--white); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 4rem;
+      background: linear-gradient(170deg, var(--white) 0%, #EDF3FF 50%, #E0FFF4 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; top: -200px; right: -200px;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(62,205,165,0.12) 0%, transparent 70%);
+    }
+    .hero::after {
+      content: ''; position: absolute; bottom: -150px; left: -150px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(43,92,230,0.1) 0%, transparent 70%);
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 800px; }
+    .hero img { height: 80px; margin-bottom: 1.5rem; display: block; margin-left: auto; margin-right: auto; }
+    .hero h1 {
+      font-size: 3.2rem; font-weight: 800; line-height: 1.15;
+      margin-bottom: 1rem;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p { font-size: 1.25rem; color: var(--gray); max-width: 600px; margin: 0 auto 2rem; }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .badge {
+      display: inline-block; margin-bottom: 1.2rem; padding: 0.35rem 1rem;
+      background: rgba(62,205,165,0.12); border-radius: 20px;
+      font-size: 0.85rem; font-weight: 600; color: #1a9e78;
+    }
+
+    /* SECTIONS */
+    section { padding: 5rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-title {
+      text-align: center; margin-bottom: 3rem;
+    }
+    .section-title h2 {
+      font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .section-title p { color: var(--gray); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+    /* PROBLEM */
+    .problem { background: var(--dark); color: var(--white); }
+    .problem .section-title h2 { color: var(--white); }
+    .problem .section-title p { color: rgba(255,255,255,0.6); }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .problem-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px; padding: 2rem;
+    }
+    .problem-card .icon { font-size: 2rem; margin-bottom: 1rem; }
+    .problem-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--teal); }
+    .problem-card p { color: rgba(255,255,255,0.6); font-size: 0.95rem; }
+
+    /* SOLUTION */
+    .solution { background: var(--light); }
+    .solution-content {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;
+    }
+    .solution-text h3 { font-size: 1.5rem; margin-bottom: 1rem; }
+    .solution-text p { color: var(--gray); margin-bottom: 1.5rem; }
+    .solution-features { list-style: none; }
+    .solution-features li {
+      padding: 0.5rem 0; display: flex; align-items: center; gap: 0.75rem;
+      font-weight: 500;
+    }
+    .solution-features li::before {
+      content: '✓'; display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--gradient); color: var(--white); font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .arch-diagram {
+      background: var(--white); border-radius: 16px; padding: 2rem;
+      box-shadow: 0 4px 24px rgba(15,27,61,0.08);
+      text-align: center; font-family: 'Courier New', monospace; font-size: 0.85rem;
+      line-height: 1.8; color: var(--navy);
+    }
+
+    /* APPS */
+    .apps-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .app-card {
+      background: var(--white); border: 1px solid rgba(15,27,61,0.08);
+      border-radius: 16px; padding: 1.5rem; text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .app-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(15,27,61,0.1); }
+    .app-card .app-icon { font-size: 2.2rem; margin-bottom: 0.75rem; }
+    .app-card h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+    .app-card .replaces { font-size: 0.8rem; color: var(--teal); font-weight: 600; margin-bottom: 0.5rem; }
+    .app-card p { font-size: 0.85rem; color: var(--gray); }
+
+    /* PRICING */
+    .pricing { background: var(--light); }
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem; max-width: 800px; margin: 0 auto;
+    }
+    .price-card {
+      background: var(--white); border-radius: 20px; padding: 2.5rem;
+      border: 1px solid rgba(15,27,61,0.08);
+      transition: transform 0.2s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card.featured {
+      background: var(--navy); color: var(--white);
+      border: 2px solid var(--teal);
+    }
+    .price-card .tier { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--teal); margin-bottom: 0.5rem; }
+    .price-card h3 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .price-card .price { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+    .price-card .price span { font-size: 1rem; font-weight: 400; opacity: 0.6; }
+    .price-card ul { list-style: none; margin-bottom: 2rem; }
+    .price-card ul li { padding: 0.4rem 0; font-size: 0.95rem; }
+    .price-card ul li::before { content: '→ '; color: var(--teal); font-weight: 700; }
+    .price-card.featured p, .price-card.featured ul li { color: rgba(255,255,255,0.7); }
+    .price-card .btn { width: 100%; text-align: center; }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,0.5); padding: 3rem 2rem;
+      text-align: center;
+    }
+    footer img { height: 32px; margin-bottom: 1rem; opacity: 0.8; }
+    footer p { font-size: 0.9rem; }
+    footer a { color: var(--teal); text-decoration: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.2rem; }
+      .solution-content { grid-template-columns: 1fr; }
+      nav .links { gap: 1rem; }
+      nav .links a { font-size: 0.85rem; }
+      .apps-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+    }
+
+    /* ANIMATIONS */
+    .fade-in {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">
+      <img src="assets/logo.png" alt="Klyvra">
+    </a>
+    <div class="links">
+      <a href="#problem">Why Klyvra</a>
+      <a href="#solution">Solution</a>
+      <a href="#apps">Apps</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://github.com/kylan11/klyvra" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <img src="assets/logo.png" alt="Klyvra Logo">
+      <div class="badge">🇪🇺 Built for European Digital Sovereignty</div>
+      <h1>Your Entire Office Stack.<br>Self-Hosted. Unified. Yours.</h1>
+      <p>Nine best-in-class open-source apps, one single sign-on, zero vendor lock-in. Deploy your sovereign productivity suite in minutes.</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/kylan11/klyvra" class="btn btn-primary">Deploy Now →</a>
+        <a href="#solution" class="btn btn-outline">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Problem With Big Tech</h2>
+        <p>European organisations face growing risks from US-controlled cloud platforms.</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <div class="icon">🔒</div>
+          <h3>Data Sovereignty at Risk</h3>
+          <p>The US CLOUD Act allows American authorities to access data stored by US providers — even on EU soil. Your organisation's data is never truly private on Microsoft 365 or Google Workspace.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="icon">⛓️</div>
+          <h3>Vendor Lock-In</h3>
+          <p>Proprietary formats, bundled ecosystems, and ever-rising subscription fees keep you trapped. Switching costs grow every year while your negotiating power shrinks.</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="icon">💸</div>
+          <h3>Unpredictable Costs</h3>
+          <p>Per-user SaaS pricing scales linearly. As your team grows, costs balloon — and you're paying for features you'll never use while missing ones you actually need.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="solution" id="solution">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Klyvra Solution</h2>
+        <p>A modular, self-hosted productivity suite that replaces your entire SaaS stack.</p>
+      </div>
+      <div class="solution-content fade-in">
+        <div class="solution-text">
+          <h3>One Command. Nine Apps. Full Control.</h3>
+          <p>Klyvra bundles the best open-source productivity tools into a single Docker Compose deployment, unified by Authentik SSO. No ClickOps — pure Infrastructure as Code.</p>
+          <ul class="solution-features">
+            <li>Single Sign-On across all apps via Authentik</li>
+            <li>Deploy in minutes with <code>make deploy</code></li>
+            <li>Modular: enable only the apps you need</li>
+            <li>Runs on any Linux server or EU sovereign cloud</li>
+            <li>100% open source — no proprietary components</li>
+            <li>GDPR-compliant by architecture, not by promise</li>
+          </ul>
+        </div>
+        <div class="arch-diagram">
+          <div style="margin-bottom:1rem; font-weight:700; font-size:1rem; color:var(--teal);">Hub &amp; Spoke Architecture</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; font-size:0.8rem;">
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📝 Outline<br><small>Wiki/Docs</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">💬 Mattermost<br><small>Chat</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🗂 Gitea<br><small>Code</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">☁️ Seafile<br><small>Files</small></div>
+            <div style="padding:0.6rem; background:rgba(43,92,230,0.15); border-radius:8px; grid-column:2; font-weight:700; color:var(--blue);">🔐 Authentik<br><small>SSO Hub</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">⏱ Kimai<br><small>Time</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">✅ Vikunja<br><small>Tasks</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📄 OnlyOffice<br><small>Office</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🪣 MinIO<br><small>Storage</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPS -->
+  <section id="apps">
+    <div class="container">
+      <div class="section-title">
+        <h2>The Complete Suite</h2>
+        <p>Every tool your team needs — without the Big Tech tax.</p>
+      </div>
+      <div class="apps-grid">
+        <div class="app-card fade-in">
+          <div class="app-icon">📝</div>
+          <h3>Outline</h3>
+          <div class="replaces">Replaces Notion / Confluence</div>
+          <p>Beautiful collaborative wiki and knowledge base with real-time editing.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">💬</div>
+          <h3>Mattermost</h3>
+          <div class="replaces">Replaces Slack / Teams</div>
+          <p>Enterprise-grade team messaging with channels, threads, and integrations.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">🗂</div>
+          <h3>Gitea</h3>
+          <div class="replaces">Replaces GitHub / GitLab</div>
+          <p>Lightweight Git hosting with pull requests, CI/CD, and code review.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">☁️</div>
+          <h3>Seafile</h3>
+          <div class="replaces">Replaces Google Drive / OneDrive</div>
+          <p>High-performance file sync &amp; share with client-side encryption.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">⏱</div>
+          <h3>Kimai</h3>
+          <div class="replaces">Replaces Toggl / Harvest</div>
+          <p>Time tracking with projects, activities, invoicing, and team management.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">✅</div>
+          <h3>Vikunja</h3>
+          <div class="replaces">Replaces Asana / Trello</div>
+          <p>Task management with Kanban boards, Gantt charts, and team collaboration.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">📄</div>
+          <h3>OnlyOffice</h3>
+          <div class="replaces">Replaces Google Docs / MS Office</div>
+          <p>Full office suite with collaborative docs, sheets, and presentations.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">🪣</div>
+          <h3>MinIO</h3>
+          <div class="replaces">Replaces AWS S3</div>
+          <p>S3-compatible object storage for app backends and file infrastructure.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">🔐</div>
+          <h3>Authentik</h3>
+          <div class="replaces">Replaces Okta / Azure AD</div>
+          <p>Identity provider and SSO hub — one login for your entire suite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-title">
+        <h2>Simple, Honest Pricing</h2>
+        <p>Open-core model: free forever for self-hosters, managed for those who prefer it.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="tier">Community</div>
+          <h3>Self-Hosted</h3>
+          <div class="price">Free <span>forever</span></div>
+          <ul>
+            <li>Full suite — all 9 apps included</li>
+            <li>Unlimited users</li>
+            <li>Docker Compose deployment</li>
+            <li>Community support on GitHub</li>
+            <li>100% open source (Apache 2.0)</li>
+          </ul>
+          <a href="https://github.com/kylan11/klyvra" class="btn btn-outline">View on GitHub</a>
+        </div>
+        <div class="price-card featured">
+          <div class="tier">Managed</div>
+          <h3>Klyvra Cloud</h3>
+          <div class="price">Custom <span>/ org</span></div>
+          <ul>
+            <li>Hosted on EU sovereign infrastructure</li>
+            <li>Fully managed — zero ops burden</li>
+            <li>SLA-backed uptime guarantee</li>
+            <li>Priority support &amp; onboarding</li>
+            <li>Custom integrations &amp; compliance</li>
+          </ul>
+          <a href="mailto:contact@klyvra.eu" class="btn btn-primary">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <img src="assets/logo_icon.png" alt="Klyvra Icon">
+    <p>&copy; 2025 Klyvra · European Digital Sovereignty, Delivered.<br>
+      <a href="https://github.com/kylan11/klyvra">GitHub</a> · Open Source under Apache 2.0
+    </p>
+  </footer>
+
+  <script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
