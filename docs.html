@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klyvra Docs — Tutorials & Guides</title>
+  <link rel="icon" href="assets/logo_icon.png" type="image/png">
+  <style>
+    :root {
+      --teal: #3ECDA5;
+      --blue: #2B5CE6;
+      --navy: #0F1B3D;
+      --dark: #080E1F;
+      --light: #F4F7FB;
+      --gray: #8892A4;
+      --white: #FFFFFF;
+      --gradient: linear-gradient(135deg, var(--teal), var(--blue));
+      --code-bg: #1a1e2e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      color: var(--navy);
+      background: var(--white);
+      line-height: 1.7;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,27,61,0.08);
+      padding: 0.8rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    nav .logo img { height: 36px; }
+    nav .links { display: flex; gap: 2rem; align-items: center; }
+    nav .links a {
+      text-decoration: none; color: var(--navy); font-size: 0.95rem;
+      font-weight: 500; opacity: 0.8; transition: opacity 0.2s;
+    }
+    nav .links a:hover { opacity: 1; }
+    nav .links a.active { opacity: 1; color: var(--teal); }
+    .btn {
+      display: inline-block; padding: 0.6rem 1.5rem; border-radius: 8px;
+      text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(43,92,230,0.3); }
+    .btn-primary { background: var(--gradient); color: var(--white); }
+
+    /* LAYOUT */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 70px;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: sticky; top: 70px; height: calc(100vh - 70px);
+      overflow-y: auto; padding: 2rem 1.5rem;
+      border-right: 1px solid rgba(15,27,61,0.08);
+      background: var(--light);
+    }
+    .sidebar h3 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--gray); margin: 1.5rem 0 0.5rem; font-weight: 700;
+    }
+    .sidebar h3:first-child { margin-top: 0; }
+    .sidebar a {
+      display: block; padding: 0.4rem 0.75rem; margin: 0.15rem 0;
+      text-decoration: none; color: var(--navy); font-size: 0.9rem;
+      border-radius: 6px; transition: background 0.15s;
+    }
+    .sidebar a:hover { background: rgba(62,205,165,0.1); }
+    .sidebar a.active { background: rgba(62,205,165,0.15); color: var(--teal); font-weight: 600; }
+
+    /* CONTENT */
+    .doc-content {
+      padding: 2.5rem 3rem;
+      max-width: 800px;
+    }
+    .doc-content h1 {
+      font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .doc-content .subtitle { color: var(--gray); font-size: 1.1rem; margin-bottom: 2rem; }
+    .doc-content h2 {
+      font-size: 1.5rem; font-weight: 700; margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem; border-bottom: 2px solid rgba(62,205,165,0.2);
+    }
+    .doc-content h3 { font-size: 1.15rem; font-weight: 600; margin: 1.5rem 0 0.75rem; }
+    .doc-content p { margin-bottom: 1rem; }
+    .doc-content ul, .doc-content ol { margin: 0 0 1rem 1.5rem; }
+    .doc-content li { margin-bottom: 0.4rem; }
+
+    .doc-content code {
+      background: rgba(62,205,165,0.1); padding: 0.15rem 0.4rem;
+      border-radius: 4px; font-size: 0.88em; font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .doc-content pre {
+      background: var(--code-bg); color: #e0e0e0; padding: 1.25rem 1.5rem;
+      border-radius: 10px; overflow-x: auto; margin: 1rem 0 1.5rem;
+      font-size: 0.88rem; line-height: 1.6;
+    }
+    .doc-content pre code {
+      background: none; padding: 0; color: inherit;
+    }
+
+    .doc-content table {
+      width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem;
+      font-size: 0.92rem;
+    }
+    .doc-content th {
+      text-align: left; padding: 0.6rem 1rem; background: var(--light);
+      font-weight: 600; border-bottom: 2px solid rgba(15,27,61,0.1);
+    }
+    .doc-content td {
+      padding: 0.5rem 1rem; border-bottom: 1px solid rgba(15,27,61,0.06);
+    }
+
+    .callout {
+      padding: 1rem 1.25rem; border-radius: 10px; margin: 1rem 0 1.5rem;
+      font-size: 0.92rem;
+    }
+    .callout-info { background: rgba(43,92,230,0.08); border-left: 4px solid var(--blue); }
+    .callout-warn { background: rgba(255,193,7,0.1); border-left: 4px solid #f0ad4e; }
+    .callout-tip { background: rgba(62,205,165,0.1); border-left: 4px solid var(--teal); }
+    .callout strong { display: block; margin-bottom: 0.3rem; }
+
+    .step-number {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--gradient); color: var(--white);
+      font-size: 0.85rem; font-weight: 700; margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    /* GUIDE CARDS (landing page) */
+    .guide-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin: 2rem 0;
+    }
+    .guide-card {
+      background: var(--white); border: 1px solid rgba(15,27,61,0.08);
+      border-radius: 16px; padding: 1.5rem; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s; text-decoration: none; color: inherit;
+    }
+    .guide-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(15,27,61,0.1); }
+    .guide-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .guide-card h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+    .guide-card p { font-size: 0.88rem; color: var(--gray); }
+    .guide-card .tag {
+      display: inline-block; margin-top: 0.75rem; padding: 0.2rem 0.6rem;
+      border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+    }
+    .tag-beginner { background: rgba(62,205,165,0.15); color: #1a9e78; }
+    .tag-intermediate { background: rgba(43,92,230,0.12); color: var(--blue); }
+    .tag-reference { background: rgba(136,146,164,0.15); color: var(--gray); }
+
+    /* PAGE SWITCHING */
+    .doc-page { display: none; }
+    .doc-page.active { display: block; }
+
+    /* FOOTER */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,0.5); padding: 2rem;
+      text-align: center; font-size: 0.85rem;
+    }
+    footer a { color: var(--teal); text-decoration: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .docs-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid rgba(15,27,61,0.08); }
+      .doc-content { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">
+      <img src="assets/logo.png" alt="Klyvra">
+    </a>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="docs.html" class="active">Docs</a>
+      <a href="https://github.com/klyvra-org/klyvra" class="btn btn-primary">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="docs-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <h3>Getting Started</h3>
+      <a href="#" onclick="showPage('overview')" class="active" data-page="overview">Overview</a>
+      <a href="#" onclick="showPage('quickstart')" data-page="quickstart">Quick Start Guide</a>
+      <a href="#" onclick="showPage('first-login')" data-page="first-login">Your First Login</a>
+
+      <h3>Core Concepts</h3>
+      <a href="#" onclick="showPage('rbac')" data-page="rbac">RBAC & Group Mapping</a>
+      <a href="#" onclick="showPage('architecture')" data-page="architecture">Architecture</a>
+      <a href="#" onclick="showPage('adapters')" data-page="adapters">Adapters & Webhooks</a>
+
+      <h3>Tutorials</h3>
+      <a href="#" onclick="showPage('add-users')" data-page="add-users">Adding Users & Groups</a>
+      <a href="#" onclick="showPage('custom-domain')" data-page="custom-domain">Custom Domain & TLS</a>
+      <a href="#" onclick="showPage('helm')" data-page="helm">Deploying with Helm</a>
+
+      <h3>Reference</h3>
+      <a href="#" onclick="showPage('apps-ref')" data-page="apps-ref">App Reference</a>
+      <a href="#" onclick="showPage('env-ref')" data-page="env-ref">Environment Variables</a>
+      <a href="#" onclick="showPage('troubleshooting')" data-page="troubleshooting">Troubleshooting</a>
+      <a href="#" onclick="showPage('makefile-ref')" data-page="makefile-ref">Makefile Commands</a>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="doc-content">
+
+      <!-- OVERVIEW (landing) -->
+      <div id="page-overview" class="doc-page active">
+        <h1>Klyvra Documentation</h1>
+        <p class="subtitle">Everything you need to deploy, configure, and manage your self-hosted productivity suite.</p>
+
+        <div class="guide-grid">
+          <a class="guide-card" onclick="showPage('quickstart')">
+            <div class="icon">🚀</div>
+            <h3>Quick Start Guide</h3>
+            <p>From zero to a running stack in 3 commands. Takes about 5 minutes.</p>
+            <span class="tag tag-beginner">Beginner</span>
+          </a>
+          <a class="guide-card" onclick="showPage('first-login')">
+            <div class="icon">🔑</div>
+            <h3>Your First Login</h3>
+            <p>Create an admin account, log into every app, and understand the SSO flow.</p>
+            <span class="tag tag-beginner">Beginner</span>
+          </a>
+          <a class="guide-card" onclick="showPage('rbac')">
+            <div class="icon">👥</div>
+            <h3>RBAC & Group Mapping</h3>
+            <p>Define groups once, have permissions auto-propagate everywhere. The core feature.</p>
+            <span class="tag tag-beginner">Beginner</span>
+          </a>
+          <a class="guide-card" onclick="showPage('add-users')">
+            <div class="icon">➕</div>
+            <h3>Adding Users & Groups</h3>
+            <p>Step-by-step: create users, assign them to groups, watch access appear across apps.</p>
+            <span class="tag tag-beginner">Beginner</span>
+          </a>
+          <a class="guide-card" onclick="showPage('helm')">
+            <div class="icon">☸️</div>
+            <h3>Deploying with Helm</h3>
+            <p>Deploy on Kubernetes with the Klyvra Helm chart. Declarative RBAC in values.yaml.</p>
+            <span class="tag tag-intermediate">Intermediate</span>
+          </a>
+          <a class="guide-card" onclick="showPage('custom-domain')">
+            <div class="icon">🌐</div>
+            <h3>Custom Domain & TLS</h3>
+            <p>Move from localhost to a real domain with automatic HTTPS via Let's Encrypt.</p>
+            <span class="tag tag-intermediate">Intermediate</span>
+          </a>
+          <a class="guide-card" onclick="showPage('architecture')">
+            <div class="icon">🏗️</div>
+            <h3>Architecture</h3>
+            <p>Hub-and-spoke SSO, adapters, blueprints, and how the pieces fit together.</p>
+            <span class="tag tag-reference">Reference</span>
+          </a>
+          <a class="guide-card" onclick="showPage('troubleshooting')">
+            <div class="icon">🔧</div>
+            <h3>Troubleshooting</h3>
+            <p>Common issues and how to fix them: ports, DNS, SSO, and more.</p>
+            <span class="tag tag-reference">Reference</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- QUICK START -->
+      <div id="page-quickstart" class="doc-page">
+        <h1>Quick Start Guide</h1>
+        <p class="subtitle">From zero to a running productivity suite in under 5 minutes.</p>
+
+        <h2>Prerequisites</h2>
+        <ul>
+          <li>Docker Engine ≥ 24.0 with Compose v2 (Docker Desktop works too)</li>
+          <li><code>openssl</code> and <code>make</code> (pre-installed on most Linux/macOS systems)</li>
+          <li>8 GB RAM minimum — all 10 apps plus their databases run simultaneously</li>
+          <li>Port 80 free (or choose another port — see below)</li>
+        </ul>
+
+        <h2>Three Commands</h2>
+        <h3><span class="step-number">1</span> Clone the repository</h3>
+        <pre><code>git clone https://github.com/klyvra-org/klyvra.git && cd klyvra</code></pre>
+
+        <h3><span class="step-number">2</span> Generate configuration</h3>
+        <pre><code>make bootstrap</code></pre>
+        <p>This creates a <code>.env</code> file with 30+ randomly generated secrets (database passwords, OIDC client secrets, API keys). You never need to touch these.</p>
+
+        <div class="callout callout-tip">
+          <strong>💡 Custom port?</strong>
+          If port 80 is taken, run <code>make bootstrap HTTP_PORT=8080</code> instead. All URLs will include the port automatically.
+        </div>
+
+        <h3><span class="step-number">3</span> Start everything</h3>
+        <pre><code>make up</code></pre>
+        <p>This builds custom images, starts 33 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
+
+        <h2>What You Get</h2>
+        <p>When <code>make up</code> finishes, these URLs are live:</p>
+
+        <table>
+          <tr><th>App</th><th>URL</th><th>What it does</th></tr>
+          <tr><td>Authentik</td><td><a href="http://auth.localhost">auth.localhost</a></td><td>Identity & SSO admin</td></tr>
+          <tr><td>Outline</td><td><a href="http://docs.localhost">docs.localhost</a></td><td>Wiki & knowledge base</td></tr>
+          <tr><td>Mattermost</td><td><a href="http://chat.localhost">chat.localhost</a></td><td>Team chat & channels</td></tr>
+          <tr><td>Gitea</td><td><a href="http://git.localhost">git.localhost</a></td><td>Git hosting & CI/CD</td></tr>
+          <tr><td>Seafile</td><td><a href="http://files.localhost">files.localhost</a></td><td>File sync & share</td></tr>
+          <tr><td>Kimai</td><td><a href="http://time.localhost">time.localhost</a></td><td>Time tracking</td></tr>
+          <tr><td>Vikunja</td><td><a href="http://tasks.localhost">tasks.localhost</a></td><td>Task management</td></tr>
+          <tr><td>Vaultwarden</td><td><a href="http://vault.localhost">vault.localhost</a></td><td>Password manager</td></tr>
+          <tr><td>Stalwart</td><td><a href="http://mail.localhost">mail.localhost</a></td><td>Email, calendar, contacts</td></tr>
+          <tr><td>OnlyOffice</td><td><a href="http://office.localhost">office.localhost</a></td><td>Document editing</td></tr>
+        </table>
+
+        <div class="callout callout-info">
+          <strong>ℹ️ Next step</strong>
+          Head to the <a href="#" onclick="showPage('first-login')">Your First Login</a> guide to create your admin account and start using the suite.
+        </div>
+      </div>
+
+      <!-- FIRST LOGIN -->
+      <div id="page-first-login" class="doc-page">
+        <h1>Your First Login</h1>
+        <p class="subtitle">Create an admin account, understand the SSO flow, and log into every app.</p>
+
+        <h2><span class="step-number">1</span> Create the Authentik Admin</h2>
+        <p>Open <a href="http://auth.localhost/if/flow/initial-setup/">http://auth.localhost/if/flow/initial-setup/</a> in your browser.</p>
+        <p>You'll see a one-time setup form. Create your admin account with a strong password. This is the only manual step in the entire setup.</p>
+
+        <div class="callout callout-warn">
+          <strong>⚠️ Save these credentials</strong>
+          This is the Authentik admin account. If you lose it, you'll need to reset via the database. Consider storing it in Vaultwarden once it's running!
+        </div>
+
+        <h2><span class="step-number">2</span> Explore the Admin Panel</h2>
+        <p>After creating your account, go to <a href="http://auth.localhost/if/admin/">http://auth.localhost/if/admin/</a>. You'll see:</p>
+        <ul>
+          <li>Applications — all 10 apps are pre-configured (done by blueprints)</li>
+          <li>Providers — 7 OIDC + 1 SAML provider, all wired up</li>
+          <li>Users — just your admin account so far</li>
+          <li>Groups — ready for you to create your company's structure</li>
+        </ul>
+
+        <h2><span class="step-number">3</span> Log Into an App</h2>
+        <p>Go to any app URL, for example <a href="http://docs.localhost">docs.localhost</a> (Outline). You'll see a login page with an SSO button:</p>
+        <ul>
+          <li>Outline → "Continue with OIDC"</li>
+          <li>Mattermost → "GitLab" (it's actually Authentik — Mattermost calls all OAuth2 "GitLab")</li>
+          <li>Gitea → "Sign in with Authentik"</li>
+          <li>Seafile → "Single Sign-On"</li>
+          <li>Kimai → "Login with Authentik"</li>
+          <li>Vikunja → "Authentik"</li>
+          <li>Vaultwarden → "Enterprise Single Sign-On" (enter any email → SSO redirects to Authentik)</li>
+        </ul>
+        <p>Click the SSO button → you're redirected to Authentik → log in → redirected back to the app, logged in. That's the flow for all apps.</p>
+
+        <div class="callout callout-tip">
+          <strong>💡 Auto-provisioning</strong>
+          You don't need to create accounts in each app. The first time you log in via SSO, a local account is automatically created in that app with your Authentik email and display name.
+        </div>
+
+        <h2><span class="step-number">4</span> Stalwart Mail</h2>
+        <p>Stalwart is slightly different — mailboxes are created automatically on first SSO login (JIT provisioning). After logging in at <a href="http://mail.localhost">mail.localhost</a>, your mailbox is ready for IMAP/SMTP at:</p>
+        <ul>
+          <li>IMAP: <code>mail.localhost:143</code></li>
+          <li>SMTP: <code>mail.localhost:587</code></li>
+          <li>Username: your Authentik email</li>
+        </ul>
+
+        <h2><span class="step-number">5</span> What's Next</h2>
+        <p>Now that you can log in, the next step is setting up your company's group structure:</p>
+        <ul>
+          <li><a href="#" onclick="showPage('add-users')">Adding Users & Groups</a> — create real users and assign them to groups</li>
+          <li><a href="#" onclick="showPage('rbac')">RBAC & Group Mapping</a> — understand how groups translate to per-app permissions</li>
+        </ul>
+      </div>
+
+      <!-- RBAC -->
+      <div id="page-rbac" class="doc-page">
+        <h1>RBAC & Group Mapping</h1>
+        <p class="subtitle">The core feature: define groups once in Authentik, have permissions propagate to every app.</p>
+
+        <h2>How It Works</h2>
+        <p>Klyvra uses a hub-and-spoke model for access control:</p>
+        <ol>
+          <li>You create a group in Authentik (e.g., "engineering")</li>
+          <li>Authentik fires a webhook to all 4 adapters</li>
+          <li>Each adapter creates the matching resource in its app:
+            <ul>
+              <li>Gitea → creates an organization</li>
+              <li>Mattermost → creates a channel</li>
+              <li>Outline → creates a group (for collection permissions)</li>
+              <li>Stalwart → creates a mailing list</li>
+            </ul>
+          </li>
+          <li>When you add a user to the group, adapters sync membership</li>
+          <li>The user's role in each app is determined by the role mapping config</li>
+        </ol>
+
+        <h2>Role Mapping</h2>
+        <p>Each adapter reads a <code>ROLE_MAPPING</code> environment variable (JSON) that maps group names to app-specific roles:</p>
+        <pre><code># Gitea adapter example
+ROLE_MAPPING='{"engineering": "owner", "management": "read", "hr": null}'</code></pre>
+
+        <table>
+          <tr><th>Value</th><th>Effect</th></tr>
+          <tr><td><code>"owner"</code>, <code>"admin"</code>, etc.</td><td>App-specific role name — see table below</td></tr>
+          <tr><td><code>null</code></td><td>Exclude — this group is NOT synced to this app at all</td></tr>
+          <tr><td><em>(group not listed)</em></td><td>Default role for the app (usually <code>member</code>)</td></tr>
+        </table>
+
+        <h2>Available Roles Per App</h2>
+        <table>
+          <tr><th>App</th><th>Roles</th><th>Default</th></tr>
+          <tr><td>Gitea</td><td><code>owner</code> · <code>admin</code> · <code>write</code> · <code>read</code></td><td><code>owner</code></td></tr>
+          <tr><td>Mattermost</td><td><code>admin</code> · <code>member</code></td><td><code>member</code></td></tr>
+          <tr><td>Outline</td><td><code>admin</code> · <code>member</code> · <code>viewer</code></td><td><code>member</code></td></tr>
+          <tr><td>Kimai</td><td><code>super_admin</code> · <code>teamlead</code> · <code>user</code></td><td>Mapped via SAML groups</td></tr>
+          <tr><td>Stalwart</td><td><code>member</code></td><td><code>member</code> (mailing list)</td></tr>
+        </table>
+
+        <h2>The null Role (Exclusion)</h2>
+        <p>Setting a role to <code>null</code> means the group is completely invisible to that app. The adapter won't create anything — no org, no channel, no group. This is how you control information boundaries:</p>
+        <pre><code># HR should NOT see code repositories
+ROLE_MAPPING='{"hr": null}'  # on the Gitea adapter
+
+# Engineering should NOT see HR timesheets
+ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</code></pre>
+
+        <h2>Helm Chart: Declarative RBAC</h2>
+        <p>When using the Helm chart, role mappings are defined declaratively in <code>values.yaml</code>:</p>
+        <pre><code>rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner          # Full repo access
+        outline: member        # Wiki read/write
+        mattermost: member     # Channel member
+        kimai: user            # Track own time
+        stalwart: member       # Mailing list
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read            # View-only repos
+        outline: admin         # Wiki admin
+        mattermost: admin      # Channel admin
+        kimai: teamlead        # Approve timesheets
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # No code access
+        outline: admin         # Wiki admin
+        kimai: teamlead        # Approve timesheets
+        stalwart: member       # Mailing list</code></pre>
+
+        <p>The chart automatically converts this into per-adapter <code>ROLE_MAPPING</code> ConfigMaps.</p>
+
+        <h2>Pending Membership Queue</h2>
+        <p>If you add a user to a group before they've ever logged into an app, the adapter queues the membership. The next time that user logs in (Authentik fires a <code>user_login</code> webhook), all pending memberships are applied automatically.</p>
+
+        <div class="callout callout-info">
+          <strong>ℹ️ No auto-removal</strong>
+          Removing a user from an Authentik group does NOT remove them from the corresponding app. This is intentional — auto-removal is destructive and could cause data loss. Manage removals directly in each app when needed.
+        </div>
+      </div>
+
+      <!-- ARCHITECTURE -->
+      <div id="page-architecture" class="doc-page">
+        <h1>Architecture</h1>
+        <p class="subtitle">How all the pieces fit together.</p>
+
+        <h2>Hub-and-Spoke SSO</h2>
+        <p>All traffic enters through Caddy (reverse proxy) on a single port. Caddy routes by subdomain to the correct backend. Authentication flows through Authentik as the central identity hub.</p>
+        <pre><code>Browser → http://{app}.{DOMAIN}:{PORT}
+           │
+           └── Caddy (reverse proxy, static IP 172.28.0.250)
+                 ├── auth.*      → Authentik    (OIDC/SAML provider)
+                 ├── docs.*      → Outline      (OIDC)
+                 ├── chat.*      → Mattermost   (OAuth2)
+                 ├── git.*       → Gitea        (OIDC)
+                 ├── files.*     → Seafile      (OAuth2)
+                 ├── time.*      → Kimai        (SAML)
+                 ├── tasks.*     → Vikunja      (OIDC)
+                 ├── vault.*     → Vaultwarden  (OIDC)
+                 ├── mail.*      → Stalwart     (OIDC)
+                 ├── office.*    → OnlyOffice   (JWT)
+                 └── minio.*     → MinIO        (internal)</code></pre>
+
+        <h2>Authentication Protocols</h2>
+        <table>
+          <tr><th>App</th><th>Protocol</th><th>Notes</th></tr>
+          <tr><td>Outline, Gitea, Vikunja, Vaultwarden, Stalwart</td><td>OIDC</td><td>Standard OpenID Connect</td></tr>
+          <tr><td>Mattermost</td><td>OAuth2</td><td>Uses "GitLab" provider type (same protocol)</td></tr>
+          <tr><td>Seafile</td><td>OAuth2</td><td>Custom OAuth via patched settings</td></tr>
+          <tr><td>Kimai</td><td>SAML 2.0</td><td>Only external auth method Kimai supports</td></tr>
+          <tr><td>OnlyOffice</td><td>JWT</td><td>No user accounts — shared secret with Outline</td></tr>
+        </table>
+
+        <h2>Blueprints (Zero-Touch Config)</h2>
+        <p>Authentik blueprints are YAML files that declaratively create all SSO providers, webhook transports, and scope mappings. They're mounted into the Authentik worker and auto-applied on startup — no UI clicks needed.</p>
+        <p>There are 15 blueprints in <code>apps/authentik/blueprints/</code>: one per OIDC/SAML provider, one per webhook transport, plus shared scope and comms launcher configs.</p>
+
+        <h2>Adapters</h2>
+        <p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 4 adapters:</p>
+        <table>
+          <tr><th>Adapter</th><th>Receives</th><th>Creates</th></tr>
+          <tr><td>outline-adapter</td><td>Group CRUD, user login</td><td>Outline groups + membership</td></tr>
+          <tr><td>mattermost-adapter</td><td>Group CRUD, user login</td><td>Channels + membership + slash commands</td></tr>
+          <tr><td>gitea-adapter</td><td>Group CRUD, user login</td><td>Organizations + team membership</td></tr>
+          <tr><td>stalwart-adapter</td><td>Group CRUD, user login</td><td>Mailing lists + JIT mailbox provisioning</td></tr>
+        </table>
+
+        <h2>Init Containers</h2>
+        <p>Init containers run once at first boot to configure apps that can't be fully configured via environment variables alone. All are idempotent — safe to re-run.</p>
+        <table>
+          <tr><th>Container</th><th>What it does</th></tr>
+          <tr><td>outline-init</td><td>Seeds API key, promotes first user to admin</td></tr>
+          <tr><td>mattermost-init</td><td>Creates team + bot token + slash commands</td></tr>
+          <tr><td>gitea-init</td><td>Registers OIDC auth source + service account</td></tr>
+          <tr><td>kimai-init</td><td>Fetches SAML signing cert, generates config</td></tr>
+          <tr><td>stalwart-init</td><td>Creates mail domain via REST API</td></tr>
+          <tr><td>minio-init</td><td>Creates S3 bucket for Outline</td></tr>
+        </table>
+
+        <h2>The Split URL Pattern</h2>
+        <p>A critical implementation detail: browser-facing and server-to-server OIDC URLs must differ inside Docker.</p>
+        <ul>
+          <li>Browser: <code>http://auth.localhost</code> (external, via Caddy)</li>
+          <li>Server: <code>http://authentik-server:9000</code> (Docker internal hostname)</li>
+        </ul>
+        <p>Apps that support separate browser/server URLs use this split directly. Apps with a single authority URL (Gitea, Vikunja, Vaultwarden) use <code>extra_hosts</code> to point the auth domain to Caddy's static IP.</p>
+      </div>
+
+      <!-- ADAPTERS -->
+      <div id="page-adapters" class="doc-page">
+        <h1>Adapters & Webhooks</h1>
+        <p class="subtitle">How Authentik events propagate to every app in real time.</p>
+
+        <h2>What Are Adapters?</h2>
+        <p>Adapters are lightweight Python (FastAPI) microservices that act as translators between Authentik and each app. When something happens in Authentik (a group is created, a user logs in), Authentik fires an HTTP webhook to the relevant adapters, which then call the target app's API.</p>
+        <pre><code>Authentik event
+    │
+    ├──webhook──→ outline-adapter ──API──→ Outline
+    ├──webhook──→ mattermost-adapter ──API──→ Mattermost
+    ├──webhook──→ gitea-adapter ──API──→ Gitea
+    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+
+        <h2>Webhook Events</h2>
+        <table>
+          <tr><th>Event</th><th>Trigger</th><th>Adapter Action</th></tr>
+          <tr><td><code>model_created</code> (group)</td><td>New group created in Authentik</td><td>Create org/channel/group/mailing list</td></tr>
+          <tr><td><code>model_updated</code> (group)</td><td>Group membership changed</td><td>Sync membership to app</td></tr>
+          <tr><td><code>model_deleted</code> (group)</td><td>Group deleted</td><td>Delete corresponding resource</td></tr>
+          <tr><td><code>user_login</code></td><td>User logs into any app</td><td>Apply pending memberships, JIT mailbox</td></tr>
+        </table>
+
+        <h2>Pending Queue</h2>
+        <p>Each adapter maintains a SQLite database for pending memberships. If a user is added to a group but hasn't logged into the target app (no local account exists), the membership is queued. On next login, all pending memberships are applied.</p>
+
+        <h2>Adapter Endpoints</h2>
+        <pre><code>POST /webhook    — Receives Authentik events
+GET  /health     — Liveness probe (returns 200)
+GET  /pending    — Lists queued pending operations</code></pre>
+
+        <h2>Shared Base</h2>
+        <p>All adapters share <code>apps/_shared/adapter_base.py</code> which provides:</p>
+        <ul>
+          <li>SQLite database initialization and pending queue management</li>
+          <li>Webhook payload parsing</li>
+          <li><code>load_role_mapping()</code> — parses <code>ROLE_MAPPING</code> env var</li>
+          <li><code>get_group_role()</code> — resolves a group name to its app-specific role (or None for exclusion)</li>
+        </ul>
+      </div>
+
+      <!-- ADDING USERS -->
+      <div id="page-add-users" class="doc-page">
+        <h1>Adding Users & Groups</h1>
+        <p class="subtitle">Step-by-step: create your company's user structure in Authentik.</p>
+
+        <h2><span class="step-number">1</span> Plan Your Groups</h2>
+        <p>Think about your company's job functions. Each group maps to a set of permissions across all apps. Common examples:</p>
+        <table>
+          <tr><th>Group</th><th>Who's in it</th><th>What they get</th></tr>
+          <tr><td><code>engineering</code></td><td>Developers, DevOps</td><td>Full code access, wiki read/write, task boards</td></tr>
+          <tr><td><code>management</code></td><td>Team leads, executives</td><td>Wiki admin, timesheet approval, view-only code</td></tr>
+          <tr><td><code>hr</code></td><td>HR team</td><td>Wiki admin, timesheet approval, NO code access</td></tr>
+          <tr><td><code>design</code></td><td>Designers</td><td>File access, wiki read/write, task boards</td></tr>
+        </table>
+
+        <h2><span class="step-number">2</span> Create Groups in Authentik</h2>
+        <ol>
+          <li>Open Authentik admin: <a href="http://auth.localhost/if/admin/#/identity/groups">auth.localhost/if/admin → Directory → Groups</a></li>
+          <li>Click <strong>Create</strong></li>
+          <li>Enter the group name (e.g., <code>engineering</code>)</li>
+          <li>Click <strong>Create</strong></li>
+        </ol>
+        <p>Within seconds, all 4 adapters receive a webhook and create the corresponding resources:</p>
+        <ul>
+          <li>Gitea: organization <code>engineering</code></li>
+          <li>Mattermost: channel <code>engineering</code></li>
+          <li>Outline: group <code>engineering</code></li>
+          <li>Stalwart: mailing list <code>engineering@yourdomain.com</code></li>
+        </ul>
+
+        <h2><span class="step-number">3</span> Create Users</h2>
+        <ol>
+          <li>Go to <strong>Directory → Users</strong> in Authentik admin</li>
+          <li>Click <strong>Create</strong></li>
+          <li>Fill in: username, display name, email</li>
+          <li>Set a temporary password (user can change on first login)</li>
+          <li>Click <strong>Create</strong></li>
+        </ol>
+
+        <h2><span class="step-number">4</span> Add Users to Groups</h2>
+        <ol>
+          <li>Open the user you just created</li>
+          <li>Go to the <strong>Groups</strong> tab</li>
+          <li>Click <strong>Add to existing group</strong></li>
+          <li>Select the group(s) this user belongs to</li>
+        </ol>
+
+        <div class="callout callout-tip">
+          <strong>💡 What happens next</strong>
+          Authentik fires a webhook. If the user has already logged into an app, they're immediately added to the group/channel/org. If they haven't logged in yet, the membership is queued and applied automatically on their first login.
+        </div>
+
+        <h2><span class="step-number">5</span> Tell Users to Log In</h2>
+        <p>Share the app URLs with your users. On first login to any app via SSO:</p>
+        <ol>
+          <li>A local account is auto-created in the app</li>
+          <li>All pending group memberships are applied</li>
+          <li>If Stalwart is enabled, a mailbox is auto-provisioned</li>
+          <li>If Mattermost onboarding is enabled, they get a welcome DM with communication links</li>
+        </ol>
+      </div>
+
+      <!-- CUSTOM DOMAIN -->
+      <div id="page-custom-domain" class="doc-page">
+        <h1>Custom Domain & TLS</h1>
+        <p class="subtitle">Move from localhost to a real domain with automatic HTTPS.</p>
+
+        <h2>Setting a Custom Domain</h2>
+        <pre><code>make destroy                            # Clean slate
+make bootstrap DOMAIN=company.com       # Generate .env with your domain
+make up                                 # Start everything</code></pre>
+        <p>All services become <code>auth.company.com</code>, <code>docs.company.com</code>, <code>chat.company.com</code>, etc.</p>
+
+        <h2>DNS Setup</h2>
+        <p>Point a wildcard DNS record to your server:</p>
+        <pre><code>*.company.com    A    → your-server-ip</code></pre>
+        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>mail</code>, <code>office</code>, <code>minio</code>.</p>
+
+        <h2>Enabling TLS (HTTPS)</h2>
+        <p>Caddy supports automatic Let's Encrypt certificates. To enable:</p>
+
+        <h3><span class="step-number">1</span> Edit the Caddyfile</h3>
+        <p>Open <code>apps/caddy/Caddyfile</code> and remove the <code>auto_https off</code> line. Change the protocol from <code>http://</code> to bare domain matching:</p>
+        <pre><code># Before:
+http://auth.{$DOMAIN}:{$HTTP_PORT} { ... }
+
+# After (Caddy auto-enables HTTPS):
+auth.{$DOMAIN} { ... }</code></pre>
+
+        <h3><span class="step-number">2</span> Update ports</h3>
+        <p>In <code>compose.yaml</code>, expose ports 80 and 443 on Caddy for HTTP→HTTPS redirect and TLS respectively.</p>
+
+        <h3><span class="step-number">3</span> Restart</h3>
+        <pre><code>make down && make up</code></pre>
+        <p>Caddy automatically obtains and renews Let's Encrypt certificates for all subdomains.</p>
+
+        <div class="callout callout-warn">
+          <strong>⚠️ Firewall</strong>
+          Ports 80 and 443 must be reachable from the internet for Let's Encrypt HTTP-01 challenges. If behind a firewall, consider using DNS-01 challenges instead.
+        </div>
+      </div>
+
+      <!-- HELM -->
+      <div id="page-helm" class="doc-page">
+        <h1>Deploying with Helm</h1>
+        <p class="subtitle">Deploy Klyvra on Kubernetes with the Helm chart.</p>
+
+        <h2>Prerequisites</h2>
+        <ul>
+          <li>Kubernetes cluster (1.25+)</li>
+          <li>Helm 3</li>
+          <li>An ingress controller (nginx-ingress, Traefik, etc.)</li>
+          <li>cert-manager (for automatic TLS) — optional but recommended</li>
+        </ul>
+
+        <h2>Build & Push Images</h2>
+        <p>Klyvra uses 10 custom images (adapters, init jobs, custom Stalwart/Seafile). Build and push them to your registry:</p>
+        <pre><code># Build locally
+make images
+
+# Push to your registry
+REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
+
+        <h2>Install</h2>
+        <pre><code>helm install klyvra ./chart/klyvra \
+  --set global.domain=company.com \
+  --set global.imageRegistry=ghcr.io/your-org \
+  --set global.imageTag=v0.1.0</code></pre>
+
+        <h2>Configure RBAC in values.yaml</h2>
+        <p>The chart's <code>values.yaml</code> has a dedicated RBAC section. Define your groups and their per-app roles:</p>
+        <pre><code>rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner
+        outline: member
+        mattermost: member
+        kimai: user
+        stalwart: member
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read
+        outline: admin
+        mattermost: admin
+        kimai: teamlead
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # Excluded from code repos
+        outline: admin
+        kimai: teamlead</code></pre>
+
+        <p>The chart converts this into per-adapter ConfigMaps automatically — no manual JSON wrangling.</p>
+
+        <h2>Enable/Disable Apps</h2>
+        <pre><code># values.yaml
+outline:
+  enabled: true
+
+kimai:
+  enabled: false     # Don't need time tracking? Disable it.</code></pre>
+
+        <h2>Ingress</h2>
+        <p>The chart creates Ingress resources for all 11 subdomains. Configure your ingress class:</p>
+        <pre><code>global:
+  ingress:
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod</code></pre>
+
+        <div class="callout callout-info">
+          <strong>ℹ️ First boot</strong>
+          After <code>helm install</code>, the same first-login process applies: visit the Authentik URL to create the admin account, then start creating users and groups.
+        </div>
+      </div>
+
+      <!-- APP REFERENCE -->
+      <div id="page-apps-ref" class="doc-page">
+        <h1>App Reference</h1>
+        <p class="subtitle">All 10 apps at a glance — what they do, how they authenticate, and what they replace.</p>
+
+        <table>
+          <tr><th>App</th><th>Subdomain</th><th>Auth</th><th>Replaces</th><th>Group Sync</th></tr>
+          <tr><td>Authentik</td><td>auth.*</td><td>Hub</td><td>Okta, Azure AD</td><td>—</td></tr>
+          <tr><td>Outline</td><td>docs.*</td><td>OIDC</td><td>Notion, Confluence</td><td>✓ Adapter</td></tr>
+          <tr><td>Mattermost</td><td>chat.*</td><td>OAuth2</td><td>Slack, Teams</td><td>✓ Adapter</td></tr>
+          <tr><td>Gitea</td><td>git.*</td><td>OIDC</td><td>GitHub, GitLab</td><td>✓ Adapter</td></tr>
+          <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>SSO only</td></tr>
+          <tr><td>Kimai</td><td>time.*</td><td>SAML</td><td>Toggl, Harvest</td><td>SAML groups</td></tr>
+          <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>SSO only</td></tr>
+          <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>SSO only</td></tr>
+          <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>No accounts</td></tr>
+          <tr><td>Stalwart</td><td>mail.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+          <tr><td>MinIO</td><td>minio.*</td><td>Internal</td><td>AWS S3</td><td>No accounts</td></tr>
+        </table>
+
+        <h2>Notes</h2>
+        <ul>
+          <li>OnlyOffice has no user accounts — it's embedded in Outline for document editing (Word/Excel/PowerPoint). Authenticated via shared JWT secret.</li>
+          <li>MinIO is the S3 backend for Outline's file storage. Not a user-facing app. Uses static admin credentials.</li>
+          <li>Vaultwarden uses the <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> fork — the official image doesn't support SSO.</li>
+          <li>Mattermost uses Enterprise Edition (free tier, no license needed) because Team Edition removed OAuth in v9.x.</li>
+          <li>Kimai maps SAML group claims to roles: <code>kimai-admin</code> → SUPER_ADMIN, <code>kimai-teamlead</code> → TEAMLEAD.</li>
+        </ul>
+      </div>
+
+      <!-- ENV REFERENCE -->
+      <div id="page-env-ref" class="doc-page">
+        <h1>Environment Variables</h1>
+        <p class="subtitle">All config lives in <code>.env</code>, generated by <code>make bootstrap</code>.</p>
+
+        <h2>User-Configurable</h2>
+        <table>
+          <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+          <tr><td><code>DOMAIN</code></td><td><code>localhost</code></td><td>Base domain — all subdomains derived from this</td></tr>
+          <tr><td><code>HTTP_PORT</code></td><td><code>80</code></td><td>Port Caddy listens on</td></tr>
+          <tr><td><code>MATTERMOST_TEAM_NAME</code></td><td><code>main</code></td><td>Default Mattermost team name</td></tr>
+          <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Create /comms, /mail, /calendar slash commands</td></tr>
+          <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Send welcome DM with comms links on first login</td></tr>
+          <tr><td><code>MAIL_URL</code></td><td><code>http://mail.${DOMAIN}</code></td><td>Target URL for mail redirect</td></tr>
+          <tr><td><code>CALENDAR_URL</code></td><td><code>http://calendar.${DOMAIN}</code></td><td>Target URL for calendar redirect</td></tr>
+          <tr><td><code>CONTACTS_URL</code></td><td><code>http://contacts.${DOMAIN}</code></td><td>Target URL for contacts redirect</td></tr>
+        </table>
+
+        <h2>Auto-Generated (don't touch)</h2>
+        <p><code>make bootstrap</code> generates 30+ secrets using <code>openssl rand</code>. These include:</p>
+        <ul>
+          <li>Database passwords for all 7 databases</li>
+          <li>OIDC client secrets for all 7 OIDC providers</li>
+          <li>Authentik secret key, bootstrap token</li>
+          <li>MinIO root password</li>
+          <li>OnlyOffice JWT secret</li>
+          <li>Stalwart admin password</li>
+        </ul>
+
+        <div class="callout callout-warn">
+          <strong>⚠️ Don't re-bootstrap with existing data</strong>
+          If you re-run <code>make bootstrap</code>, it regenerates all passwords. Existing database volumes still have the old passwords. Run <code>make destroy</code> first to wipe volumes.
+        </div>
+      </div>
+
+      <!-- TROUBLESHOOTING -->
+      <div id="page-troubleshooting" class="doc-page">
+        <h1>Troubleshooting</h1>
+        <p class="subtitle">Common issues and how to fix them.</p>
+
+        <h2>Port 80 in use</h2>
+        <pre><code>make bootstrap HTTP_PORT=8080
+make up</code></pre>
+
+        <h2>Stale volumes after re-bootstrapping</h2>
+        <p>If you re-run <code>make bootstrap</code> (which regenerates passwords), existing database volumes still have the old passwords:</p>
+        <pre><code>make destroy        # removes containers AND volumes
+make bootstrap      # fresh .env
+make up             # clean start</code></pre>
+
+        <h2>*.localhost doesn't resolve</h2>
+        <p>Most modern systems resolve <code>*.localhost</code> to <code>127.0.0.1</code> (RFC 6761). If your browser can't reach the URLs, add entries to <code>/etc/hosts</code>:</p>
+        <pre><code># /etc/hosts
+127.0.0.1 auth.localhost docs.localhost chat.localhost git.localhost
+127.0.0.1 files.localhost time.localhost tasks.localhost vault.localhost
+127.0.0.1 mail.localhost office.localhost minio.localhost</code></pre>
+
+        <h2>Service won't start</h2>
+        <pre><code>docker compose logs &lt;service-name&gt;    # Check logs
+docker compose ps -a                    # Check exit codes
+make logs SVC=&lt;service-name&gt;           # Follow logs</code></pre>
+
+        <h2>SSO button missing in Seafile</h2>
+        <p>Seafile's OAuth config is patched at runtime by an embedded boot script. If the SSO button is missing:</p>
+        <pre><code>docker logs klyvra-seafile-1 2>&1 | grep oauth-boot</code></pre>
+
+        <h2>Vaultwarden SSO not working</h2>
+        <p>Klyvra uses <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> (<code>timshel/oidcwarden:latest</code>), not the official Vaultwarden image. The official image silently ignores <code>SSO_*</code> env vars. OIDCWarden still requires a master password after SSO login (by design — it encrypts your vault).</p>
+
+        <h2>Mattermost shows "GitLab" as SSO provider</h2>
+        <p>This is expected. Mattermost's free tier only supports "GitLab" as an OAuth2 provider type. Authentik is configured to match GitLab's userinfo format, so it works transparently. The button says "GitLab" but actually redirects to Authentik.</p>
+
+        <h2>Init container keeps restarting</h2>
+        <p>Init containers use <code>restart: on-failure</code> and retry until their target app is ready. Check if the target app is healthy:</p>
+        <pre><code>docker compose ps        # Look for unhealthy services
+make status              # Full status dashboard</code></pre>
+
+        <h2>Checking adapter health</h2>
+        <pre><code># View adapter logs
+make logs SVC=outline-adapter
+make logs SVC=gitea-adapter
+
+# Check pending queue
+docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>
+      </div>
+
+      <!-- MAKEFILE REFERENCE -->
+      <div id="page-makefile-ref" class="doc-page">
+        <h1>Makefile Commands</h1>
+        <p class="subtitle">Every command available for managing your Klyvra deployment.</p>
+
+        <table>
+          <tr><th>Command</th><th>Description</th></tr>
+          <tr><td><code>make bootstrap</code></td><td>Generate <code>.env</code> with random secrets</td></tr>
+          <tr><td><code>make bootstrap DOMAIN=x HTTP_PORT=y</code></td><td>Custom domain and port</td></tr>
+          <tr><td><code>make up</code></td><td>Build images, start all services, wait for health</td></tr>
+          <tr><td><code>make down</code></td><td>Stop all services (data preserved in volumes)</td></tr>
+          <tr><td><code>make destroy</code></td><td>Stop and delete all data (volumes removed)</td></tr>
+          <tr><td><code>make start</code> / <code>make stop</code></td><td>Start/stop without rebuilding</td></tr>
+          <tr><td><code>make healthcheck</code></td><td>Quick HTTP check on all routes</td></tr>
+          <tr><td><code>make test</code></td><td>Run 95 adapter unit tests</td></tr>
+          <tr><td><code>make verify</code></td><td>Run full verification suite (74 checks)</td></tr>
+          <tr><td><code>make logs [SVC=x]</code></td><td>Follow container logs (all or specific)</td></tr>
+          <tr><td><code>make restart [SVC=x]</code></td><td>Restart services (all or specific)</td></tr>
+          <tr><td><code>make status</code></td><td>Container status dashboard</td></tr>
+          <tr><td><code>make images</code></td><td>Build all 10 custom Docker images</td></tr>
+          <tr><td><code>make push-images</code></td><td>Build and push images to registry</td></tr>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2025–2026 Klyvra · <a href="index.html">Home</a> · <a href="https://github.com/klyvra-org/klyvra">GitHub</a></p>
+  </footer>
+
+  <script>
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.doc-page').forEach(p => p.classList.remove('active'));
+      // Show target
+      const target = document.getElementById('page-' + pageId);
+      if (target) target.classList.add('active');
+      // Update sidebar active state
+      document.querySelectorAll('.sidebar a[data-page]').forEach(a => {
+        a.classList.toggle('active', a.dataset.page === pageId);
+      });
+      // Scroll to top of content
+      document.querySelector('.doc-content').scrollTop = 0;
+      window.scrollTo(0, 0);
+      // Update URL hash
+      history.replaceState(null, '', '#' + pageId);
+    }
+
+    // Handle initial hash
+    window.addEventListener('DOMContentLoaded', () => {
+      const hash = window.location.hash.slice(1);
+      if (hash && document.getElementById('page-' + hash)) {
+        showPage(hash);
+      }
+    });
+  </script>
+</body>
+</html>

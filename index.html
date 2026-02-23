@@ -219,8 +219,10 @@
       <a href="#problem">Why Klyvra</a>
       <a href="#solution">Solution</a>
       <a href="#apps">Apps</a>
+      <a href="features.html">Features</a>
       <a href="#pricing">Pricing</a>
-      <a href="https://github.com/kylan11/klyvra" class="btn btn-primary">Get Started</a>
+      <a href="docs.html" style="color:var(--teal);">Docs</a>
+      <a href="https://github.com/klyvra-org/klyvra" class="btn btn-primary">Get Started</a>
     </div>
   </nav>
 
@@ -230,9 +232,9 @@
       <img src="assets/logo.png" alt="Klyvra Logo">
       <div class="badge">🇪🇺 Built for European Digital Sovereignty</div>
       <h1>Your Entire Office Stack.<br>Self-Hosted. Unified. Yours.</h1>
-      <p>Nine best-in-class open-source apps, one single sign-on, zero vendor lock-in. Deploy your sovereign productivity suite in minutes.</p>
+      <p>Ten best-in-class open-source apps, one single sign-on, zero vendor lock-in. Deploy your sovereign productivity suite in minutes.</p>
       <div class="hero-buttons">
-        <a href="https://github.com/kylan11/klyvra" class="btn btn-primary">Deploy Now →</a>
+        <a href="https://github.com/klyvra-org/klyvra" class="btn btn-primary">Deploy Now →</a>
         <a href="#solution" class="btn btn-outline">Learn More</a>
       </div>
     </div>
@@ -274,13 +276,13 @@
       </div>
       <div class="solution-content fade-in">
         <div class="solution-text">
-          <h3>One Command. Nine Apps. Full Control.</h3>
-          <p>Klyvra bundles the best open-source productivity tools into a single Docker Compose deployment, unified by Authentik SSO. No ClickOps — pure Infrastructure as Code.</p>
+          <h3>One Command. Ten Apps. Full Control.</h3>
+          <p>Klyvra bundles the best open-source productivity tools into a single deployment, unified by Authentik SSO. Define your company's groups once — permissions propagate to every app automatically. No ClickOps — pure Infrastructure as Code.</p>
           <ul class="solution-features">
             <li>Single Sign-On across all apps via Authentik</li>
-            <li>Deploy in minutes with <code>make deploy</code></li>
-            <li>Modular: enable only the apps you need</li>
-            <li>Runs on any Linux server or EU sovereign cloud</li>
+            <li>Deploy in minutes with <code>make up</code> or <code>helm install</code></li>
+            <li>RBAC: define groups once, roles sync everywhere</li>
+            <li>Runs on any Linux server, Kubernetes, or EU sovereign cloud</li>
             <li>100% open source — no proprietary components</li>
             <li>GDPR-compliant by architecture, not by promise</li>
           </ul>
@@ -296,6 +298,8 @@
             <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">⏱ Kimai<br><small>Time</small></div>
             <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">✅ Vikunja<br><small>Tasks</small></div>
             <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📄 OnlyOffice<br><small>Office</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🔑 Vaultwarden<br><small>Passwords</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📧 Stalwart<br><small>Mail/Cal</small></div>
             <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🪣 MinIO<br><small>Storage</small></div>
           </div>
         </div>
@@ -365,6 +369,18 @@
           <div class="replaces">Replaces Okta / Azure AD</div>
           <p>Identity provider and SSO hub — one login for your entire suite.</p>
         </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">🔑</div>
+          <h3>Vaultwarden</h3>
+          <div class="replaces">Replaces 1Password / LastPass</div>
+          <p>Bitwarden-compatible password manager with SSO login via OIDCWarden.</p>
+        </div>
+        <div class="app-card fade-in">
+          <div class="app-icon">📧</div>
+          <h3>Stalwart</h3>
+          <div class="replaces">Replaces Gmail / Exchange</div>
+          <p>Full mail server with SMTP, IMAP, CalDAV, CardDAV, and webmail — mailboxes auto-provisioned on first SSO login.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -382,13 +398,13 @@
           <h3>Self-Hosted</h3>
           <div class="price">Free <span>forever</span></div>
           <ul>
-            <li>Full suite — all 9 apps included</li>
+            <li>Full suite — all 10 apps included</li>
             <li>Unlimited users</li>
-            <li>Docker Compose deployment</li>
+            <li>Docker Compose &amp; Helm chart deployment</li>
             <li>Community support on GitHub</li>
             <li>100% open source (Apache 2.0)</li>
           </ul>
-          <a href="https://github.com/kylan11/klyvra" class="btn btn-outline">View on GitHub</a>
+          <a href="https://github.com/klyvra-org/klyvra" class="btn btn-outline">View on GitHub</a>
         </div>
         <div class="price-card featured">
           <div class="tier">Managed</div>
@@ -401,7 +417,7 @@
             <li>Priority support &amp; onboarding</li>
             <li>Custom integrations &amp; compliance</li>
           </ul>
-          <a href="mailto:contact@klyvra.eu" class="btn btn-primary">Contact Sales</a>
+          <a href="#" class="btn btn-primary" style="opacity:0.7; pointer-events:none; cursor:default;">Coming Soon</a>
         </div>
       </div>
     </div>
@@ -410,8 +426,8 @@
   <!-- FOOTER -->
   <footer>
     <img src="assets/logo_icon.png" alt="Klyvra Icon">
-    <p>&copy; 2025 Klyvra · European Digital Sovereignty, Delivered.<br>
-      <a href="https://github.com/kylan11/klyvra">GitHub</a> · Open Source under Apache 2.0
+    <p>&copy; 2025–2026 Klyvra · European Digital Sovereignty, Delivered.<br>
+      <a href="https://github.com/klyvra-org/klyvra">GitHub</a> · Open Source under Apache 2.0
     </p>
   </footer>
 
