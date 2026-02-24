@@ -192,13 +192,76 @@
     footer p { font-size: 0.9rem; }
     footer a { color: var(--teal); text-decoration: none; }
 
+    /* NAV SCROLL BEHAVIOR */
+    nav {
+      transition: transform 0.3s ease;
+    }
+    nav.nav-hidden {
+      transform: translateY(-100%);
+    }
+
+    /* HAMBURGER */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+      z-index: 10000;
+      position: relative;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--navy);
+      border-radius: 2px;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .hero h1 { font-size: 2.2rem; }
       .solution-content { grid-template-columns: 1fr; }
-      nav .links { gap: 1rem; }
-      nav .links a { font-size: 0.85rem; }
       .apps-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+
+      .hamburger { display: flex; }
+
+      nav .links {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #FFFFFF !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5rem;
+        z-index: 9999;
+        display: none !important;
+      }
+      nav .links.open {
+        display: flex !important;
+      }
+      nav .links a {
+        font-size: 1.3rem;
+        opacity: 1;
+        color: var(--navy);
+      }
     }
 
     /* ANIMATIONS */
@@ -216,6 +279,9 @@
     <a href="#" class="logo">
       <img src="assets/logo.png" alt="Klyvra">
     </a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
     <div class="links">
       <a href="#problem">Why Klyvra</a>
       <a href="#solution">Solution</a>
@@ -443,6 +509,34 @@
     }, { threshold: 0.1 });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Hamburger menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const links = document.querySelector('.links');
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      links.classList.toggle('open');
+    });
+    // Close menu when a link is clicked
+    links.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        links.classList.remove('open');
+      });
+    });
+
+    // Hide nav on scroll down, show on scroll up
+    let lastScrollY = window.scrollY;
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if (links.classList.contains('open')) return;
+      if (window.scrollY > lastScrollY && window.scrollY > 80) {
+        nav.classList.add('nav-hidden');
+      } else {
+        nav.classList.remove('nav-hidden');
+      }
+      lastScrollY = window.scrollY;
+    });
   </script>
 </body>
 </html>
