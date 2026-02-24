@@ -1,0 +1,26 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Makefile Commands</h1>
+<p class="subtitle">Every command available for managing your Klyvra deployment.</p>
+
+<table>
+  <tr><th>Command</th><th>Description</th></tr>
+  <tr><td><code>make bootstrap</code></td><td>Generate <code>.env</code> with random secrets</td></tr>
+  <tr><td><code>make bootstrap DOMAIN=x HTTP_PORT=y</code></td><td>Custom domain and port</td></tr>
+  <tr><td><code>make up</code></td><td>Build images, start all services, wait for health</td></tr>
+  <tr><td><code>make down</code></td><td>Stop all services (data preserved in volumes)</td></tr>
+  <tr><td><code>make destroy</code></td><td>Stop and delete all data (volumes removed)</td></tr>
+  <tr><td><code>make start</code> / <code>make stop</code></td><td>Start/stop without rebuilding</td></tr>
+  <tr><td><code>make healthcheck</code></td><td>Quick HTTP check on all routes</td></tr>
+  <tr><td><code>make test</code></td><td>Run 95 adapter unit tests</td></tr>
+  <tr><td><code>make verify</code></td><td>Run full verification suite (74 checks)</td></tr>
+  <tr><td><code>make logs [SVC=x]</code></td><td>Follow container logs (all or specific)</td></tr>
+  <tr><td><code>make restart [SVC=x]</code></td><td>Restart services (all or specific)</td></tr>
+  <tr><td><code>make status</code></td><td>Container status dashboard</td></tr>
+  <tr><td><code>make images</code></td><td>Build all 10 custom Docker images</td></tr>
+  <tr><td><code>make push-images</code></td><td>Build and push images to registry</td></tr>
+</table>

@@ -1,0 +1,55 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Guida Rapida</h1>
+<p class="subtitle">Da zero a una suite di produttività funzionante in meno di 5 minuti.</p>
+
+<h2>Prerequisiti</h2>
+<ul>
+  <li>Docker Engine ≥ 24.0 con Compose v2 (funziona anche Docker Desktop)</li>
+  <li><code>openssl</code> e <code>make</code> (preinstallati sulla maggior parte dei sistemi Linux/macOS)</li>
+  <li>Minimo 8 GB di RAM — tutte le 10 app e i relativi database vengono eseguiti contemporaneamente</li>
+  <li>Porta 80 libera (oppure scegliete un'altra porta — vedi sotto)</li>
+</ul>
+
+<h2>Tre Comandi</h2>
+<h3><span class="step-number">1</span> Clonare il repository</h3>
+<pre><code>git clone https://github.com/klyvra-org/klyvra.git && cd klyvra</code></pre>
+
+<h3><span class="step-number">2</span> Generare la configurazione</h3>
+<pre><code>make bootstrap</code></pre>
+<p>Questo crea un file <code>.env</code> con oltre 30 segreti generati casualmente (password dei database, client secret OIDC, chiavi API). Non è necessario modificarli.</p>
+
+<div class="callout callout-tip">
+  <strong>💡 Porta personalizzata?</strong>
+  Se la porta 80 è già occupata, eseguite <code>make bootstrap HTTP_PORT=8080</code>. Tutti gli URL includeranno la porta automaticamente.
+</div>
+
+<h3><span class="step-number">3</span> Avviare tutto</h3>
+<pre><code>make up</code></pre>
+<p>Questo compila le immagini personalizzate, avvia 33 container, attende i controlli di salute ed esegue gli init container. Richiede circa 2–3 minuti alla prima esecuzione.</p>
+
+<h2>Cosa Ottenete</h2>
+<p>Quando <code>make up</code> termina, questi URL sono attivi:</p>
+
+<table>
+  <tr><th>App</th><th>URL</th><th>Funzione</th></tr>
+  <tr><td>Authentik</td><td><a href="http://auth.localhost">auth.localhost</a></td><td>Identità e amministrazione SSO</td></tr>
+  <tr><td>Outline</td><td><a href="http://docs.localhost">docs.localhost</a></td><td>Wiki e base di conoscenza</td></tr>
+  <tr><td>Mattermost</td><td><a href="http://chat.localhost">chat.localhost</a></td><td>Chat di team e canali</td></tr>
+  <tr><td>Gitea</td><td><a href="http://git.localhost">git.localhost</a></td><td>Hosting Git e CI/CD</td></tr>
+  <tr><td>Seafile</td><td><a href="http://files.localhost">files.localhost</a></td><td>Sincronizzazione e condivisione file</td></tr>
+  <tr><td>Kimai</td><td><a href="http://time.localhost">time.localhost</a></td><td>Tracciamento del tempo</td></tr>
+  <tr><td>Vikunja</td><td><a href="http://tasks.localhost">tasks.localhost</a></td><td>Gestione delle attività</td></tr>
+  <tr><td>Vaultwarden</td><td><a href="http://vault.localhost">vault.localhost</a></td><td>Gestore di password</td></tr>
+  <tr><td>Stalwart</td><td><a href="http://mail.localhost">mail.localhost</a></td><td>Email, calendario, contatti</td></tr>
+  <tr><td>OnlyOffice</td><td><a href="http://office.localhost">office.localhost</a></td><td>Editing di documenti</td></tr>
+</table>
+
+<div class="callout callout-info">
+  <strong>ℹ️ Prossimo passo</strong>
+  Passate alla guida <a href="/docs/first-login">Il Vostro Primo Accesso</a> per creare il vostro account amministratore e iniziare a utilizzare la suite.
+</div>

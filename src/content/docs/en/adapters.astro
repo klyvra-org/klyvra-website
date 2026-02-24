@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Adapters & Webhooks</h1>
+<p class="subtitle">How Authentik events propagate to every app in real time.</p>
+
+<h2>What Are Adapters?</h2>
+<p>Adapters are lightweight Python (FastAPI) microservices that act as translators between Authentik and each app. When something happens in Authentik (a group is created, a user logs in), Authentik fires an HTTP webhook to the relevant adapters, which then call the target app's API.</p>
+<pre><code>Authentik event
+    │
+    ├──webhook──→ outline-adapter ──API──→ Outline
+    ├──webhook──→ mattermost-adapter ──API──→ Mattermost
+    ├──webhook──→ gitea-adapter ──API──→ Gitea
+    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+
+<h2>Webhook Events</h2>
+<table>
+  <tr><th>Event</th><th>Trigger</th><th>Adapter Action</th></tr>
+  <tr><td><code>model_created</code> (group)</td><td>New group created in Authentik</td><td>Create org/channel/group/mailing list</td></tr>
+  <tr><td><code>model_updated</code> (group)</td><td>Group membership changed</td><td>Sync membership to app</td></tr>
+  <tr><td><code>model_deleted</code> (group)</td><td>Group deleted</td><td>Delete corresponding resource</td></tr>
+  <tr><td><code>user_login</code></td><td>User logs into any app</td><td>Apply pending memberships, JIT mailbox</td></tr>
+</table>
+
+<h2>Pending Queue</h2>
+<p>Each adapter maintains a SQLite database for pending memberships. If a user is added to a group but hasn't logged into the target app (no local account exists), the membership is queued. On next login, all pending memberships are applied.</p>
+
+<h2>Adapter Endpoints</h2>
+<pre><code>POST /webhook    — Receives Authentik events
+GET  /health     — Liveness probe (returns 200)
+GET  /pending    — Lists queued pending operations</code></pre>
+
+<h2>Shared Base</h2>
+<p>All adapters share <code>apps/_shared/adapter_base.py</code> which provides:</p>
+<ul>
+  <li>SQLite database initialization and pending queue management</li>
+  <li>Webhook payload parsing</li>
+  <li><code>load_role_mapping()</code> — parses <code>ROLE_MAPPING</code> env var</li>
+  <li><code>get_group_role()</code> — resolves a group name to its app-specific role (or None for exclusion)</li>
+</ul>

@@ -1,0 +1,64 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Benutzer & Gruppen hinzufügen</h1>
+<p class="subtitle">Schritt für Schritt: Erstellen Sie Ihre Unternehmensstruktur in Authentik.</p>
+
+<h2><span class="step-number">1</span> Gruppen planen</h2>
+<p>Überlegen Sie sich die Aufgabenbereiche in Ihrem Unternehmen. Jede Gruppe wird auf einen Satz von Berechtigungen in allen Apps abgebildet. Häufige Beispiele:</p>
+<table>
+  <tr><th>Gruppe</th><th>Mitglieder</th><th>Berechtigungen</th></tr>
+  <tr><td><code>engineering</code></td><td>Entwickler, DevOps</td><td>Voller Code-Zugriff, Wiki-Lese-/Schreibzugriff, Aufgaben-Boards</td></tr>
+  <tr><td><code>management</code></td><td>Teamleiter, Geschäftsführung</td><td>Wiki-Admin, Zeiterfassungs-Freigabe, Code nur lesend</td></tr>
+  <tr><td><code>hr</code></td><td>HR-Team</td><td>Wiki-Admin, Zeiterfassungs-Freigabe, KEIN Code-Zugriff</td></tr>
+  <tr><td><code>design</code></td><td>Designer</td><td>Dateizugriff, Wiki-Lese-/Schreibzugriff, Aufgaben-Boards</td></tr>
+</table>
+
+<h2><span class="step-number">2</span> Gruppen in Authentik erstellen</h2>
+<ol>
+  <li>Öffnen Sie die Authentik-Verwaltung: <a href="http://auth.localhost/if/admin/#/identity/groups">auth.localhost/if/admin → Directory → Groups</a></li>
+  <li>Klicken Sie auf <strong>Create</strong></li>
+  <li>Geben Sie den Gruppennamen ein (z. B. <code>engineering</code>)</li>
+  <li>Klicken Sie auf <strong>Create</strong></li>
+</ol>
+<p>Innerhalb von Sekunden erhalten alle 4 adapters einen webhook und erstellen die entsprechenden Ressourcen:</p>
+<ul>
+  <li>Gitea: Organisation <code>engineering</code></li>
+  <li>Mattermost: Kanal <code>engineering</code></li>
+  <li>Outline: Gruppe <code>engineering</code></li>
+  <li>Stalwart: Mailingliste <code>engineering@ihredomain.com</code></li>
+</ul>
+
+<h2><span class="step-number">3</span> Benutzer erstellen</h2>
+<ol>
+  <li>Navigieren Sie zu <strong>Directory → Users</strong> in der Authentik-Verwaltung</li>
+  <li>Klicken Sie auf <strong>Create</strong></li>
+  <li>Füllen Sie aus: Benutzername, Anzeigename, E-Mail</li>
+  <li>Legen Sie ein temporäres Passwort fest (der Benutzer kann es beim ersten Login ändern)</li>
+  <li>Klicken Sie auf <strong>Create</strong></li>
+</ol>
+
+<h2><span class="step-number">4</span> Benutzer zu Gruppen hinzufügen</h2>
+<ol>
+  <li>Öffnen Sie den gerade erstellten Benutzer</li>
+  <li>Gehen Sie zum Tab <strong>Groups</strong></li>
+  <li>Klicken Sie auf <strong>Add to existing group</strong></li>
+  <li>Wählen Sie die Gruppe(n), zu denen dieser Benutzer gehören soll</li>
+</ol>
+
+<div class="callout callout-tip">
+  <strong>💡 Was dann passiert</strong>
+  Authentik sendet einen webhook. Wenn der Benutzer sich bereits bei einer App angemeldet hat, wird er sofort zur Gruppe/zum Kanal/zur Organisation hinzugefügt. Hat er sich noch nicht angemeldet, wird die Mitgliedschaft in die Warteschlange gestellt und beim ersten Login automatisch angewendet.
+</div>
+
+<h2><span class="step-number">5</span> Benutzer zum Login auffordern</h2>
+<p>Teilen Sie die App-URLs mit Ihren Benutzern. Beim ersten Login bei einer App via SSO:</p>
+<ol>
+  <li>Ein lokales Konto wird automatisch in der App erstellt</li>
+  <li>Alle ausstehenden Gruppenmitgliedschaften werden angewendet</li>
+  <li>Wenn Stalwart aktiviert ist, wird ein Postfach automatisch bereitgestellt</li>
+  <li>Wenn das Mattermost-Onboarding aktiviert ist, erhält der Benutzer eine Willkommens-DM mit Kommunikationslinks</li>
+</ol>

@@ -1,0 +1,44 @@
+---
+import type { Locale } from '../i18n/locales';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  locale: Locale;
+  currentPath: string;
+  activePage?: 'home' | 'features' | 'docs';
+  footerVariant?: 'full' | 'docs';
+}
+
+const { title, locale, currentPath, activePage, footerVariant = 'full' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang={locale}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <link rel="icon" href="/assets/logo_icon.png" type="image/png">
+</head>
+<body>
+  <Nav locale={locale} currentPath={currentPath} activePage={activePage} />
+
+  <slot />
+
+  <Footer locale={locale} variant={footerVariant} />
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

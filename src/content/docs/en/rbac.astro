@@ -1,0 +1,100 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const roleMapExample = `# Gitea adapter example
+ROLE_MAPPING='{"engineering": "owner", "management": "read", "hr": null}'`;
+
+const roleMapExclusion = `# HR should NOT see code repositories
+ROLE_MAPPING='{"hr": null}'  # on the Gitea adapter
+
+# Engineering should NOT see HR timesheets
+ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)`;
+
+const helmRbac = `rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner          # Full repo access
+        outline: member        # Wiki read/write
+        mattermost: member     # Channel member
+        kimai: user            # Track own time
+        stalwart: member       # Mailing list
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read            # View-only repos
+        outline: admin         # Wiki admin
+        mattermost: admin      # Channel admin
+        kimai: teamlead        # Approve timesheets
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # No code access
+        outline: admin         # Wiki admin
+        kimai: teamlead        # Approve timesheets
+        stalwart: member       # Mailing list`;
+---
+
+<h1>RBAC & Group Mapping</h1>
+<p class="subtitle">The core feature: define groups once in Authentik, have permissions propagate to every app.</p>
+
+<h2>How It Works</h2>
+<p>Klyvra uses a hub-and-spoke model for access control:</p>
+<ol>
+  <li>You create a group in Authentik (e.g., "engineering")</li>
+  <li>Authentik fires a webhook to all 4 adapters</li>
+  <li>Each adapter creates the matching resource in its app:
+    <ul>
+      <li>Gitea → creates an organization</li>
+      <li>Mattermost → creates a channel</li>
+      <li>Outline → creates a group (for collection permissions)</li>
+      <li>Stalwart → creates a mailing list</li>
+    </ul>
+  </li>
+  <li>When you add a user to the group, adapters sync membership</li>
+  <li>The user's role in each app is determined by the role mapping config</li>
+</ol>
+
+<h2>Role Mapping</h2>
+<p>Each adapter reads a <code>ROLE_MAPPING</code> environment variable (JSON) that maps group names to app-specific roles:</p>
+<pre><code set:text={roleMapExample} /></pre>
+
+<table>
+  <tr><th>Value</th><th>Effect</th></tr>
+  <tr><td><code>"owner"</code>, <code>"admin"</code>, etc.</td><td>App-specific role name — see table below</td></tr>
+  <tr><td><code>null</code></td><td>Exclude — this group is NOT synced to this app at all</td></tr>
+  <tr><td><em>(group not listed)</em></td><td>Default role for the app (usually <code>member</code>)</td></tr>
+</table>
+
+<h2>Available Roles Per App</h2>
+<table>
+  <tr><th>App</th><th>Roles</th><th>Default</th></tr>
+  <tr><td>Gitea</td><td><code>owner</code> · <code>admin</code> · <code>write</code> · <code>read</code></td><td><code>owner</code></td></tr>
+  <tr><td>Mattermost</td><td><code>admin</code> · <code>member</code></td><td><code>member</code></td></tr>
+  <tr><td>Outline</td><td><code>admin</code> · <code>member</code> · <code>viewer</code></td><td><code>member</code></td></tr>
+  <tr><td>Kimai</td><td><code>super_admin</code> · <code>teamlead</code> · <code>user</code></td><td>Mapped via SAML groups</td></tr>
+  <tr><td>Stalwart</td><td><code>member</code></td><td><code>member</code> (mailing list)</td></tr>
+</table>
+
+<h2>The null Role (Exclusion)</h2>
+<p>Setting a role to <code>null</code> means the group is completely invisible to that app. The adapter won't create anything — no org, no channel, no group. This is how you control information boundaries:</p>
+<pre><code set:text={roleMapExclusion} /></pre>
+
+<h2>Helm Chart: Declarative RBAC</h2>
+<p>When using the Helm chart, role mappings are defined declaratively in <code>values.yaml</code>:</p>
+<pre><code set:text={helmRbac} /></pre>
+
+<p>The chart automatically converts this into per-adapter <code>ROLE_MAPPING</code> ConfigMaps.</p>
+
+<h2>Pending Membership Queue</h2>
+<p>If you add a user to a group before they've ever logged into an app, the adapter queues the membership. The next time that user logs in (Authentik fires a <code>user_login</code> webhook), all pending memberships are applied automatically.</p>
+
+<div class="callout callout-info">
+  <strong>ℹ️ No auto-removal</strong>
+  Removing a user from an Authentik group does NOT remove them from the corresponding app. This is intentional — auto-removal is destructive and could cause data loss. Manage removals directly in each app when needed.
+</div>

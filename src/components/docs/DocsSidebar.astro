@@ -1,0 +1,34 @@
+---
+import { t, localizedPath } from '../../i18n/index';
+import type { Locale } from '../../i18n/locales';
+import { docsNav } from '../../data/docs-nav';
+
+interface Props {
+  locale: Locale;
+  currentSlug?: string; // undefined = overview page
+}
+
+const { locale, currentSlug } = Astro.props;
+---
+
+<aside class="sidebar">
+  <h3>{t(locale, 'docs.nav_getting_started')}</h3>
+  <a href={localizedPath(locale, '/docs')} class={currentSlug === undefined ? 'active' : ''}>
+    {t(locale, 'docs.nav_overview')}
+  </a>
+  {docsNav.map((group) => (
+    <>
+      {group.titleKey !== 'docs.nav_getting_started' && (
+        <h3>{t(locale, group.titleKey)}</h3>
+      )}
+      {group.items.map((item) => (
+        <a
+          href={localizedPath(locale, `/docs/${item.slug}`)}
+          class={currentSlug === item.slug ? 'active' : ''}
+        >
+          {t(locale, item.titleKey)}
+        </a>
+      ))}
+    </>
+  ))}
+</aside>

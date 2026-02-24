@@ -1,0 +1,37 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Variáveis de Ambiente</h1>
+<p class="subtitle">Toda a configuração vive no <code>.env</code>, gerado pelo <code>make bootstrap</code>.</p>
+
+<h2>Configuráveis pelo Utilizador</h2>
+<table>
+  <tr><th>Variável</th><th>Predefinição</th><th>Descrição</th></tr>
+  <tr><td><code>DOMAIN</code></td><td><code>localhost</code></td><td>Domínio base — todos os subdomínios derivam deste</td></tr>
+  <tr><td><code>HTTP_PORT</code></td><td><code>80</code></td><td>Porta em que o Caddy escuta</td></tr>
+  <tr><td><code>MATTERMOST_TEAM_NAME</code></td><td><code>main</code></td><td>Nome da equipa predefinida do Mattermost</td></tr>
+  <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Criar slash commands /comms, /mail, /calendar</td></tr>
+  <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Enviar mensagem de boas-vindas com links de comunicação no primeiro login</td></tr>
+  <tr><td><code>MAIL_URL</code></td><td><code>{"http://mail.${DOMAIN}"}</code></td><td>URL de destino para redirecionamento de e-mail</td></tr>
+  <tr><td><code>CALENDAR_URL</code></td><td><code>{"http://calendar.${DOMAIN}"}</code></td><td>URL de destino para redirecionamento de calendário</td></tr>
+  <tr><td><code>CONTACTS_URL</code></td><td><code>{"http://contacts.${DOMAIN}"}</code></td><td>URL de destino para redirecionamento de contactos</td></tr>
+</table>
+
+<h2>Geradas Automaticamente (não alterar)</h2>
+<p>O <code>make bootstrap</code> gera mais de 30 segredos com <code>openssl rand</code>. Estes incluem:</p>
+<ul>
+  <li>Palavras-passe de bases de dados para as 7 bases de dados</li>
+  <li>OIDC client secrets para os 7 providers OIDC</li>
+  <li>Chave secreta do Authentik, bootstrap token</li>
+  <li>Palavra-passe root do MinIO</li>
+  <li>Segredo JWT do OnlyOffice</li>
+  <li>Palavra-passe de administração do Stalwart</li>
+</ul>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Não refazer bootstrap com dados existentes</strong>
+  Se voltar a executar <code>make bootstrap</code>, regenera todas as palavras-passe. Os volumes de base de dados existentes ainda têm as palavras-passe antigas. Execute <code>make destroy</code> primeiro para limpar os volumes.
+</div>

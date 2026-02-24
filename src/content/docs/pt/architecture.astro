@@ -1,0 +1,71 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const archDiagram = `Browser → http://{app}.{DOMAIN}:{PORT}
+       │
+       └── Caddy (reverse proxy, static IP 172.28.0.250)
+             ├── auth.*      → Authentik    (OIDC/SAML provider)
+             ├── docs.*      → Outline      (OIDC)
+             ├── chat.*      → Mattermost   (OAuth2)
+             ├── git.*       → Gitea        (OIDC)
+             ├── files.*     → Seafile      (OAuth2)
+             ├── time.*      → Kimai        (SAML)
+             ├── tasks.*     → Vikunja      (OIDC)
+             ├── vault.*     → Vaultwarden  (OIDC)
+             ├── mail.*      → Stalwart     (OIDC)
+             ├── office.*    → OnlyOffice   (JWT)
+             └── minio.*     → MinIO        (internal)`;
+---
+
+<h1>Arquitetura</h1>
+<p class="subtitle">Como todas as peças encaixam.</p>
+
+<h2>SSO Hub-and-Spoke</h2>
+<p>Todo o tráfego entra através do Caddy (reverse proxy) numa única porta. O Caddy encaminha por subdomínio para o backend correto. A autenticação passa pelo Authentik como hub central de identidade.</p>
+<pre><code set:text={archDiagram} /></pre>
+
+<h2>Protocolos de Autenticação</h2>
+<table>
+  <tr><th>Aplicação</th><th>Protocolo</th><th>Notas</th></tr>
+  <tr><td>Outline, Gitea, Vikunja, Vaultwarden, Stalwart</td><td>OIDC</td><td>OpenID Connect padrão</td></tr>
+  <tr><td>Mattermost</td><td>OAuth2</td><td>Usa o tipo de provider "GitLab" (mesmo protocolo)</td></tr>
+  <tr><td>Seafile</td><td>OAuth2</td><td>OAuth personalizado via configurações com patch</td></tr>
+  <tr><td>Kimai</td><td>SAML 2.0</td><td>Único método de autenticação externa suportado pelo Kimai</td></tr>
+  <tr><td>OnlyOffice</td><td>JWT</td><td>Sem contas de utilizador — segredo partilhado com o Outline</td></tr>
+</table>
+
+<h2>Blueprints (Configuração Zero-Touch)</h2>
+<p>Os blueprints do Authentik são ficheiros YAML que criam declarativamente todos os providers SSO, transportes de webhook e mapeamentos de scope. São montados no worker do Authentik e aplicados automaticamente no arranque — sem cliques na interface necessários.</p>
+<p>Existem 15 blueprints em <code>apps/authentik/blueprints/</code>: um por provider OIDC/SAML, um por transporte de webhook, mais configurações partilhadas de scope e lançamento de comunicações.</p>
+
+<h2>Adapters</h2>
+<p>Os adapters são microserviços FastAPI leves que recebem webhooks do Authentik e os traduzem em chamadas API específicas de cada aplicação. Existem 4 adapters:</p>
+<table>
+  <tr><th>Adapter</th><th>Recebe</th><th>Cria</th></tr>
+  <tr><td>outline-adapter</td><td>CRUD de grupo, login de utilizador</td><td>Grupos Outline + adesão</td></tr>
+  <tr><td>mattermost-adapter</td><td>CRUD de grupo, login de utilizador</td><td>Canais + adesão + slash commands</td></tr>
+  <tr><td>gitea-adapter</td><td>CRUD de grupo, login de utilizador</td><td>Organizações + adesão a equipas</td></tr>
+  <tr><td>stalwart-adapter</td><td>CRUD de grupo, login de utilizador</td><td>Listas de distribuição + provisionamento JIT de caixas de correio</td></tr>
+</table>
+
+<h2>Init Containers</h2>
+<p>Os init containers executam uma vez no primeiro arranque para configurar aplicações que não podem ser totalmente configuradas apenas via variáveis de ambiente. Todos são idempotentes — seguros para reexecutar.</p>
+<table>
+  <tr><th>Container</th><th>O que faz</th></tr>
+  <tr><td>outline-init</td><td>Cria API key, promove o primeiro utilizador a admin</td></tr>
+  <tr><td>mattermost-init</td><td>Cria equipa + bot token + slash commands</td></tr>
+  <tr><td>gitea-init</td><td>Regista fonte de autenticação OIDC + conta de serviço</td></tr>
+  <tr><td>kimai-init</td><td>Obtém certificado de assinatura SAML, gera configuração</td></tr>
+  <tr><td>stalwart-init</td><td>Cria domínio de e-mail via REST API</td></tr>
+  <tr><td>minio-init</td><td>Cria bucket S3 para o Outline</td></tr>
+</table>
+
+<h2>O Padrão Split URL</h2>
+<p>Um detalhe de implementação crítico: os URLs para o browser e para comunicação servidor-a-servidor OIDC devem ser diferentes dentro do Docker.</p>
+<ul>
+  <li>Browser: <code>http://auth.localhost</code> (externo, via Caddy)</li>
+  <li>Servidor: <code>http://authentik-server:9000</code> (hostname interno Docker)</li>
+</ul>
+<p>As aplicações que suportam URLs separados para browser/servidor usam este split diretamente. As aplicações com um único URL de autoridade (Gitea, Vikunja, Vaultwarden) usam <code>extra_hosts</code> para apontar o domínio de autenticação para o IP estático do Caddy.</p>

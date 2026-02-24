@@ -1,0 +1,100 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const roleMapExample = `# Gitea adapter example
+ROLE_MAPPING='{"engineering": "owner", "management": "read", "hr": null}'`;
+
+const roleMapExclusion = `# HR should NOT see code repositories
+ROLE_MAPPING='{"hr": null}'  # on the Gitea adapter
+
+# Engineering should NOT see HR timesheets
+ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)`;
+
+const helmRbac = `rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner          # Full repo access
+        outline: member        # Wiki read/write
+        mattermost: member     # Channel member
+        kimai: user            # Track own time
+        stalwart: member       # Mailing list
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read            # View-only repos
+        outline: admin         # Wiki admin
+        mattermost: admin      # Channel admin
+        kimai: teamlead        # Approve timesheets
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # No code access
+        outline: admin         # Wiki admin
+        kimai: teamlead        # Approve timesheets
+        stalwart: member       # Mailing list`;
+---
+
+<h1>RBAC e Mappatura dei Gruppi</h1>
+<p class="subtitle">La funzionalità principale: definite i gruppi una sola volta in Authentik e i permessi si propagano a ogni app.</p>
+
+<h2>Come Funziona</h2>
+<p>Klyvra utilizza un modello hub-and-spoke per il controllo degli accessi:</p>
+<ol>
+  <li>Create un gruppo in Authentik (ad es. "engineering")</li>
+  <li>Authentik invia un webhook a tutti i 4 adapter</li>
+  <li>Ogni adapter crea la risorsa corrispondente nella propria app:
+    <ul>
+      <li>Gitea → crea un'organizzazione</li>
+      <li>Mattermost → crea un canale</li>
+      <li>Outline → crea un gruppo (per i permessi delle collezioni)</li>
+      <li>Stalwart → crea una mailing list</li>
+    </ul>
+  </li>
+  <li>Quando aggiungete un utente al gruppo, gli adapter sincronizzano l'appartenenza</li>
+  <li>Il ruolo dell'utente in ogni app è determinato dalla configurazione di mappatura dei ruoli</li>
+</ol>
+
+<h2>Mappatura dei Ruoli</h2>
+<p>Ogni adapter legge una variabile d'ambiente <code>ROLE_MAPPING</code> (JSON) che mappa i nomi dei gruppi ai ruoli specifici dell'app:</p>
+<pre><code set:text={roleMapExample} /></pre>
+
+<table>
+  <tr><th>Valore</th><th>Effetto</th></tr>
+  <tr><td><code>"owner"</code>, <code>"admin"</code>, ecc.</td><td>Nome del ruolo specifico dell'app — vedi tabella sotto</td></tr>
+  <tr><td><code>null</code></td><td>Esclusione — questo gruppo NON viene sincronizzato con questa app</td></tr>
+  <tr><td><em>(gruppo non elencato)</em></td><td>Ruolo predefinito per l'app (di solito <code>member</code>)</td></tr>
+</table>
+
+<h2>Ruoli Disponibili Per App</h2>
+<table>
+  <tr><th>App</th><th>Ruoli</th><th>Predefinito</th></tr>
+  <tr><td>Gitea</td><td><code>owner</code> · <code>admin</code> · <code>write</code> · <code>read</code></td><td><code>owner</code></td></tr>
+  <tr><td>Mattermost</td><td><code>admin</code> · <code>member</code></td><td><code>member</code></td></tr>
+  <tr><td>Outline</td><td><code>admin</code> · <code>member</code> · <code>viewer</code></td><td><code>member</code></td></tr>
+  <tr><td>Kimai</td><td><code>super_admin</code> · <code>teamlead</code> · <code>user</code></td><td>Mappato tramite gruppi SAML</td></tr>
+  <tr><td>Stalwart</td><td><code>member</code></td><td><code>member</code> (mailing list)</td></tr>
+</table>
+
+<h2>Il Ruolo null (Esclusione)</h2>
+<p>Impostare un ruolo a <code>null</code> significa che il gruppo è completamente invisibile per quell'app. L'adapter non creerà nulla — nessuna organizzazione, nessun canale, nessun gruppo. È così che controllate i confini informativi:</p>
+<pre><code set:text={roleMapExclusion} /></pre>
+
+<h2>Helm Chart: RBAC Dichiarativo</h2>
+<p>Quando utilizzate l'Helm chart, le mappature dei ruoli sono definite in modo dichiarativo in <code>values.yaml</code>:</p>
+<pre><code set:text={helmRbac} /></pre>
+
+<p>Il chart converte automaticamente questo in ConfigMap <code>ROLE_MAPPING</code> per ogni adapter.</p>
+
+<h2>Coda delle Appartenenze in Sospeso</h2>
+<p>Se aggiungete un utente a un gruppo prima che abbia mai effettuato l'accesso a un'app, l'adapter mette in coda l'appartenenza. La prossima volta che l'utente accede (Authentik invia un webhook <code>user_login</code>), tutte le appartenenze in sospeso vengono applicate automaticamente.</p>
+
+<div class="callout callout-info">
+  <strong>ℹ️ Nessuna rimozione automatica</strong>
+  Rimuovere un utente da un gruppo Authentik NON lo rimuove dall'app corrispondente. Questo è intenzionale — la rimozione automatica è distruttiva e potrebbe causare perdita di dati. Gestite le rimozioni direttamente in ogni app quando necessario.
+</div>

@@ -1,0 +1,53 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Troubleshooting</h1>
+<p class="subtitle">Common issues and how to fix them.</p>
+
+<h2>Port 80 in use</h2>
+<pre><code>make bootstrap HTTP_PORT=8080
+make up</code></pre>
+
+<h2>Stale volumes after re-bootstrapping</h2>
+<p>If you re-run <code>make bootstrap</code> (which regenerates passwords), existing database volumes still have the old passwords:</p>
+<pre><code>make destroy        # removes containers AND volumes
+make bootstrap      # fresh .env
+make up             # clean start</code></pre>
+
+<h2>*.localhost doesn't resolve</h2>
+<p>Most modern systems resolve <code>*.localhost</code> to <code>127.0.0.1</code> (RFC 6761). If your browser can't reach the URLs, add entries to <code>/etc/hosts</code>:</p>
+<pre><code># /etc/hosts
+127.0.0.1 auth.localhost docs.localhost chat.localhost git.localhost
+127.0.0.1 files.localhost time.localhost tasks.localhost vault.localhost
+127.0.0.1 mail.localhost office.localhost minio.localhost</code></pre>
+
+<h2>Service won't start</h2>
+<pre><code>docker compose logs &lt;service-name&gt;    # Check logs
+docker compose ps -a                    # Check exit codes
+make logs SVC=&lt;service-name&gt;           # Follow logs</code></pre>
+
+<h2>SSO button missing in Seafile</h2>
+<p>Seafile's OAuth config is patched at runtime by an embedded boot script. If the SSO button is missing:</p>
+<pre><code>docker logs klyvra-seafile-1 2>&1 | grep oauth-boot</code></pre>
+
+<h2>Vaultwarden SSO not working</h2>
+<p>Klyvra uses <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> (<code>timshel/oidcwarden:latest</code>), not the official Vaultwarden image. The official image silently ignores <code>SSO_*</code> env vars. OIDCWarden still requires a master password after SSO login (by design — it encrypts your vault).</p>
+
+<h2>Mattermost shows "GitLab" as SSO provider</h2>
+<p>This is expected. Mattermost's free tier only supports "GitLab" as an OAuth2 provider type. Authentik is configured to match GitLab's userinfo format, so it works transparently. The button says "GitLab" but actually redirects to Authentik.</p>
+
+<h2>Init container keeps restarting</h2>
+<p>Init containers use <code>restart: on-failure</code> and retry until their target app is ready. Check if the target app is healthy:</p>
+<pre><code>docker compose ps        # Look for unhealthy services
+make status              # Full status dashboard</code></pre>
+
+<h2>Checking adapter health</h2>
+<pre><code># View adapter logs
+make logs SVC=outline-adapter
+make logs SVC=gitea-adapter
+
+# Check pending queue
+docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>

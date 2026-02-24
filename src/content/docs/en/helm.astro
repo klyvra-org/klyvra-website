@@ -1,0 +1,81 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Deploying with Helm</h1>
+<p class="subtitle">Deploy Klyvra on Kubernetes with the Helm chart.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>Kubernetes cluster (1.25+)</li>
+  <li>Helm 3</li>
+  <li>An ingress controller (nginx-ingress, Traefik, etc.)</li>
+  <li>cert-manager (for automatic TLS) — optional but recommended</li>
+</ul>
+
+<h2>Build & Push Images</h2>
+<p>Klyvra uses 10 custom images (adapters, init jobs, custom Stalwart/Seafile). Build and push them to your registry:</p>
+<pre><code># Build locally
+make images
+
+# Push to your registry
+REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
+
+<h2>Install</h2>
+<pre><code>helm install klyvra ./chart/klyvra \
+  --set global.domain=company.com \
+  --set global.imageRegistry=ghcr.io/your-org \
+  --set global.imageTag=v0.1.0</code></pre>
+
+<h2>Configure RBAC in values.yaml</h2>
+<p>The chart's <code>values.yaml</code> has a dedicated RBAC section. Define your groups and their per-app roles:</p>
+<pre><code>rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner
+        outline: member
+        mattermost: member
+        kimai: user
+        stalwart: member
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read
+        outline: admin
+        mattermost: admin
+        kimai: teamlead
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # Excluded from code repos
+        outline: admin
+        kimai: teamlead</code></pre>
+
+<p>The chart converts this into per-adapter ConfigMaps automatically — no manual JSON wrangling.</p>
+
+<h2>Enable/Disable Apps</h2>
+<pre><code># values.yaml
+outline:
+  enabled: true
+
+kimai:
+  enabled: false     # Don't need time tracking? Disable it.</code></pre>
+
+<h2>Ingress</h2>
+<p>The chart creates Ingress resources for all 11 subdomains. Configure your ingress class:</p>
+<pre><code>global:
+  ingress:
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod</code></pre>
+
+<div class="callout callout-info">
+  <strong>ℹ️ First boot</strong>
+  After <code>helm install</code>, the same first-login process applies: visit the Authentik URL to create the admin account, then start creating users and groups.
+</div>

@@ -1,0 +1,24 @@
+---
+import { t, localizedPath } from '../i18n/index';
+import type { Locale } from '../i18n/locales';
+
+interface Props {
+  locale: Locale;
+  variant?: 'full' | 'docs';
+}
+
+const { locale, variant = 'full' } = Astro.props;
+---
+
+{variant === 'full' ? (
+  <footer>
+    <img src="/assets/logo_icon.png" alt="Klyvra Icon">
+    <p>&copy; 2025–2026 Klyvra · {t(locale, 'common.footer_tagline')}<br>
+      <a href="https://github.com/klyvra-org/klyvra">GitHub</a> · {t(locale, 'common.footer_license')}
+    </p>
+  </footer>
+) : (
+  <footer class="docs-footer">
+    <p>&copy; 2025–2026 Klyvra · <a href={localizedPath(locale, '/')}>{t(locale, 'common.nav_home')}</a> · <a href="https://github.com/klyvra-org/klyvra">GitHub</a></p>
+  </footer>
+)}

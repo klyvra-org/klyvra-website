@@ -1,0 +1,59 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Su Primer Inicio de Sesión</h1>
+<p class="subtitle">Cree una cuenta de administrador, comprenda el flujo SSO e inicie sesión en todas las aplicaciones.</p>
+
+<h2><span class="step-number">1</span> Cree el Administrador de Authentik</h2>
+<p>Abra <a href="http://auth.localhost/if/flow/initial-setup/">http://auth.localhost/if/flow/initial-setup/</a> en su navegador.</p>
+<p>Verá un formulario de configuración inicial de un solo uso. Cree su cuenta de administrador con una contraseña segura. Este es el único paso manual en toda la configuración.</p>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Guarde estas credenciales</strong>
+  Esta es la cuenta de administrador de Authentik. Si la pierde, deberá restablecerla a través de la base de datos. ¡Considere almacenarla en Vaultwarden una vez que esté en funcionamiento!
+</div>
+
+<h2><span class="step-number">2</span> Explore el Panel de Administración</h2>
+<p>Después de crear su cuenta, vaya a <a href="http://auth.localhost/if/admin/">http://auth.localhost/if/admin/</a>. Verá:</p>
+<ul>
+  <li>Applications — las 10 aplicaciones están preconfiguradas (mediante blueprints)</li>
+  <li>Providers — 7 proveedores OIDC + 1 SAML, todos conectados</li>
+  <li>Users — solo su cuenta de administrador por ahora</li>
+  <li>Groups — listo para que cree la estructura de su empresa</li>
+</ul>
+
+<h2><span class="step-number">3</span> Inicie Sesión en una Aplicación</h2>
+<p>Vaya a la URL de cualquier aplicación, por ejemplo <a href="http://docs.localhost">docs.localhost</a> (Outline). Verá una página de inicio de sesión con un botón SSO:</p>
+<ul>
+  <li>Outline → "Continue with OIDC"</li>
+  <li>Mattermost → "GitLab" (en realidad es Authentik — Mattermost llama "GitLab" a todo OAuth2)</li>
+  <li>Gitea → "Sign in with Authentik"</li>
+  <li>Seafile → "Single Sign-On"</li>
+  <li>Kimai → "Login with Authentik"</li>
+  <li>Vikunja → "Authentik"</li>
+  <li>Vaultwarden → "Enterprise Single Sign-On" (introduzca cualquier correo → SSO redirige a Authentik)</li>
+</ul>
+<p>Haga clic en el botón SSO → se le redirige a Authentik → inicie sesión → se le redirige de vuelta a la aplicación, con sesión iniciada. Ese es el flujo para todas las aplicaciones.</p>
+
+<div class="callout callout-tip">
+  <strong>💡 Aprovisionamiento automático</strong>
+  No necesita crear cuentas en cada aplicación. La primera vez que inicie sesión vía SSO, se crea automáticamente una cuenta local en esa aplicación con su correo y nombre de Authentik.
+</div>
+
+<h2><span class="step-number">4</span> Stalwart Mail</h2>
+<p>Stalwart es ligeramente diferente — los buzones se crean automáticamente en el primer inicio de sesión SSO (aprovisionamiento JIT). Después de iniciar sesión en <a href="http://mail.localhost">mail.localhost</a>, su buzón está listo para IMAP/SMTP en:</p>
+<ul>
+  <li>IMAP: <code>mail.localhost:143</code></li>
+  <li>SMTP: <code>mail.localhost:587</code></li>
+  <li>Nombre de usuario: su correo de Authentik</li>
+</ul>
+
+<h2><span class="step-number">5</span> Siguientes Pasos</h2>
+<p>Ahora que puede iniciar sesión, el siguiente paso es configurar la estructura de grupos de su empresa:</p>
+<ul>
+  <li><a href="/docs/add-users">Añadir Usuarios y Grupos</a> — cree usuarios reales y asígnelos a grupos</li>
+  <li><a href="/docs/rbac">RBAC y Mapeo de Grupos</a> — comprenda cómo los grupos se traducen en permisos por aplicación</li>
+</ul>

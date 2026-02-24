@@ -1,0 +1,44 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const caddyCode = `# Before:
+http://auth.{$DOMAIN}:{$HTTP_PORT} { ... }
+
+# After (Caddy auto-enables HTTPS):
+auth.{$DOMAIN} { ... }`;
+---
+
+<h1>Dominio Personalizado y TLS</h1>
+<p class="subtitle">Pase de localhost a un dominio real con HTTPS automático.</p>
+
+<h2>Configurar un Dominio Personalizado</h2>
+<pre><code>make destroy                            # Clean slate
+make bootstrap DOMAIN=company.com       # Generate .env with your domain
+make up                                 # Start everything</code></pre>
+<p>Todos los servicios pasan a ser <code>auth.company.com</code>, <code>docs.company.com</code>, <code>chat.company.com</code>, etc.</p>
+
+<h2>Configuración DNS</h2>
+<p>Apunte un registro DNS comodín a su servidor:</p>
+<pre><code>*.company.com    A    → your-server-ip</code></pre>
+<p>O cree registros A individuales para cada subdominio: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>mail</code>, <code>office</code>, <code>minio</code>.</p>
+
+<h2>Habilitar TLS (HTTPS)</h2>
+<p>Caddy soporta certificados automáticos de Let's Encrypt. Para habilitarlo:</p>
+
+<h3><span class="step-number">1</span> Edite el Caddyfile</h3>
+<p>Abra <code>apps/caddy/Caddyfile</code> y elimine la línea <code>auto_https off</code>. Cambie el protocolo de <code>http://</code> a coincidencia por dominio sin protocolo:</p>
+<pre><code set:text={caddyCode} /></pre>
+
+<h3><span class="step-number">2</span> Actualice los puertos</h3>
+<p>En <code>compose.yaml</code>, exponga los puertos 80 y 443 en Caddy para la redirección HTTP→HTTPS y TLS respectivamente.</p>
+
+<h3><span class="step-number">3</span> Reinicie</h3>
+<pre><code>make down && make up</code></pre>
+<p>Caddy obtiene y renueva automáticamente los certificados de Let's Encrypt para todos los subdominios.</p>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Firewall</strong>
+  Los puertos 80 y 443 deben ser accesibles desde internet para los desafíos HTTP-01 de Let's Encrypt. Si está detrás de un firewall, considere usar desafíos DNS-01 en su lugar.
+</div>

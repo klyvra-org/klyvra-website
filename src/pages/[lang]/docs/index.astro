@@ -1,0 +1,71 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import { t, localizedPath } from '../../../i18n/index';
+import { locales, defaultLocale, type Locale } from '../../../i18n/locales';
+
+export function getStaticPaths() {
+  return locales
+    .filter(l => l !== defaultLocale)
+    .map(lang => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+---
+
+<DocsLayout title={t(locale, 'docs.meta_title')} locale={locale} currentPath={`/${locale}/docs`}>
+
+  <h1>{t(locale, 'docs.overview_title')}</h1>
+  <p class="subtitle">{t(locale, 'docs.overview_subtitle')}</p>
+
+  <div class="guide-grid">
+    <a class="guide-card" href={localizedPath(locale, '/docs/quickstart')}>
+      <div class="icon">🚀</div>
+      <h3>{t(locale, 'docs.card_quickstart_title')}</h3>
+      <p>{t(locale, 'docs.card_quickstart_desc')}</p>
+      <span class="tag tag-beginner">{t(locale, 'docs.tag_beginner')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/first-login')}>
+      <div class="icon">🔑</div>
+      <h3>{t(locale, 'docs.card_first_login_title')}</h3>
+      <p>{t(locale, 'docs.card_first_login_desc')}</p>
+      <span class="tag tag-beginner">{t(locale, 'docs.tag_beginner')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/rbac')}>
+      <div class="icon">👥</div>
+      <h3>{t(locale, 'docs.card_rbac_title')}</h3>
+      <p>{t(locale, 'docs.card_rbac_desc')}</p>
+      <span class="tag tag-beginner">{t(locale, 'docs.tag_beginner')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/add-users')}>
+      <div class="icon">➕</div>
+      <h3>{t(locale, 'docs.card_add_users_title')}</h3>
+      <p>{t(locale, 'docs.card_add_users_desc')}</p>
+      <span class="tag tag-beginner">{t(locale, 'docs.tag_beginner')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/helm')}>
+      <div class="icon">☸️</div>
+      <h3>{t(locale, 'docs.card_helm_title')}</h3>
+      <p>{t(locale, 'docs.card_helm_desc')}</p>
+      <span class="tag tag-intermediate">{t(locale, 'docs.tag_intermediate')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/custom-domain')}>
+      <div class="icon">🌐</div>
+      <h3>{t(locale, 'docs.card_custom_domain_title')}</h3>
+      <p>{t(locale, 'docs.card_custom_domain_desc')}</p>
+      <span class="tag tag-intermediate">{t(locale, 'docs.tag_intermediate')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/architecture')}>
+      <div class="icon">🏗️</div>
+      <h3>{t(locale, 'docs.card_architecture_title')}</h3>
+      <p>{t(locale, 'docs.card_architecture_desc')}</p>
+      <span class="tag tag-reference">{t(locale, 'docs.tag_reference')}</span>
+    </a>
+    <a class="guide-card" href={localizedPath(locale, '/docs/troubleshooting')}>
+      <div class="icon">🔧</div>
+      <h3>{t(locale, 'docs.card_troubleshooting_title')}</h3>
+      <p>{t(locale, 'docs.card_troubleshooting_desc')}</p>
+      <span class="tag tag-reference">{t(locale, 'docs.tag_reference')}</span>
+    </a>
+  </div>
+
+</DocsLayout>

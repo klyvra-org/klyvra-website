@@ -1,0 +1,29 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { t } from '../../i18n/index';
+import { defaultLocale } from '../../i18n/locales';
+import { allDocSlugs, docsNav } from '../../data/docs-nav';
+
+export function getStaticPaths() {
+  return allDocSlugs.map(slug => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const locale = defaultLocale;
+
+// Dynamically import the doc content component
+const docModules = import.meta.glob('../../content/docs/en/*.astro');
+const modulePath = `../../content/docs/en/${slug}.astro`;
+const mod = docModules[modulePath];
+if (!mod) {
+  return Astro.redirect('/docs');
+}
+const DocContent = (await mod() as any).default;
+
+const navItem = docsNav.flatMap(group => group.items).find(item => item.slug === slug);
+const pageTitle = navItem ? t(locale, navItem.titleKey) : slug;
+---
+
+<DocsLayout title={`${pageTitle} — Klyvra Docs`} locale={locale} currentPath={`/docs/${slug}`} currentSlug={slug}>
+  <DocContent locale={locale} />
+</DocsLayout>

@@ -1,0 +1,71 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const archDiagram = `Browser → http://{app}.{DOMAIN}:{PORT}
+       │
+       └── Caddy (reverse proxy, static IP 172.28.0.250)
+             ├── auth.*      → Authentik    (OIDC/SAML provider)
+             ├── docs.*      → Outline      (OIDC)
+             ├── chat.*      → Mattermost   (OAuth2)
+             ├── git.*       → Gitea        (OIDC)
+             ├── files.*     → Seafile      (OAuth2)
+             ├── time.*      → Kimai        (SAML)
+             ├── tasks.*     → Vikunja      (OIDC)
+             ├── vault.*     → Vaultwarden  (OIDC)
+             ├── mail.*      → Stalwart     (OIDC)
+             ├── office.*    → OnlyOffice   (JWT)
+             └── minio.*     → MinIO        (internal)`;
+---
+
+<h1>Architecture</h1>
+<p class="subtitle">How all the pieces fit together.</p>
+
+<h2>Hub-and-Spoke SSO</h2>
+<p>All traffic enters through Caddy (reverse proxy) on a single port. Caddy routes by subdomain to the correct backend. Authentication flows through Authentik as the central identity hub.</p>
+<pre><code set:text={archDiagram} /></pre>
+
+<h2>Authentication Protocols</h2>
+<table>
+  <tr><th>App</th><th>Protocol</th><th>Notes</th></tr>
+  <tr><td>Outline, Gitea, Vikunja, Vaultwarden, Stalwart</td><td>OIDC</td><td>Standard OpenID Connect</td></tr>
+  <tr><td>Mattermost</td><td>OAuth2</td><td>Uses "GitLab" provider type (same protocol)</td></tr>
+  <tr><td>Seafile</td><td>OAuth2</td><td>Custom OAuth via patched settings</td></tr>
+  <tr><td>Kimai</td><td>SAML 2.0</td><td>Only external auth method Kimai supports</td></tr>
+  <tr><td>OnlyOffice</td><td>JWT</td><td>No user accounts — shared secret with Outline</td></tr>
+</table>
+
+<h2>Blueprints (Zero-Touch Config)</h2>
+<p>Authentik blueprints are YAML files that declaratively create all SSO providers, webhook transports, and scope mappings. They're mounted into the Authentik worker and auto-applied on startup — no UI clicks needed.</p>
+<p>There are 15 blueprints in <code>apps/authentik/blueprints/</code>: one per OIDC/SAML provider, one per webhook transport, plus shared scope and comms launcher configs.</p>
+
+<h2>Adapters</h2>
+<p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 4 adapters:</p>
+<table>
+  <tr><th>Adapter</th><th>Receives</th><th>Creates</th></tr>
+  <tr><td>outline-adapter</td><td>Group CRUD, user login</td><td>Outline groups + membership</td></tr>
+  <tr><td>mattermost-adapter</td><td>Group CRUD, user login</td><td>Channels + membership + slash commands</td></tr>
+  <tr><td>gitea-adapter</td><td>Group CRUD, user login</td><td>Organizations + team membership</td></tr>
+  <tr><td>stalwart-adapter</td><td>Group CRUD, user login</td><td>Mailing lists + JIT mailbox provisioning</td></tr>
+</table>
+
+<h2>Init Containers</h2>
+<p>Init containers run once at first boot to configure apps that can't be fully configured via environment variables alone. All are idempotent — safe to re-run.</p>
+<table>
+  <tr><th>Container</th><th>What it does</th></tr>
+  <tr><td>outline-init</td><td>Seeds API key, promotes first user to admin</td></tr>
+  <tr><td>mattermost-init</td><td>Creates team + bot token + slash commands</td></tr>
+  <tr><td>gitea-init</td><td>Registers OIDC auth source + service account</td></tr>
+  <tr><td>kimai-init</td><td>Fetches SAML signing cert, generates config</td></tr>
+  <tr><td>stalwart-init</td><td>Creates mail domain via REST API</td></tr>
+  <tr><td>minio-init</td><td>Creates S3 bucket for Outline</td></tr>
+</table>
+
+<h2>The Split URL Pattern</h2>
+<p>A critical implementation detail: browser-facing and server-to-server OIDC URLs must differ inside Docker.</p>
+<ul>
+  <li>Browser: <code>http://auth.localhost</code> (external, via Caddy)</li>
+  <li>Server: <code>http://authentik-server:9000</code> (Docker internal hostname)</li>
+</ul>
+<p>Apps that support separate browser/server URLs use this split directly. Apps with a single authority URL (Gitea, Vikunja, Vaultwarden) use <code>extra_hosts</code> to point the auth domain to Caddy's static IP.</p>

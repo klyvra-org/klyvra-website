@@ -1,0 +1,32 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>App Reference</h1>
+<p class="subtitle">All 10 apps at a glance — what they do, how they authenticate, and what they replace.</p>
+
+<table>
+  <tr><th>App</th><th>Subdomain</th><th>Auth</th><th>Replaces</th><th>Group Sync</th></tr>
+  <tr><td>Authentik</td><td>auth.*</td><td>Hub</td><td>Okta, Azure AD</td><td>—</td></tr>
+  <tr><td>Outline</td><td>docs.*</td><td>OIDC</td><td>Notion, Confluence</td><td>✓ Adapter</td></tr>
+  <tr><td>Mattermost</td><td>chat.*</td><td>OAuth2</td><td>Slack, Teams</td><td>✓ Adapter</td></tr>
+  <tr><td>Gitea</td><td>git.*</td><td>OIDC</td><td>GitHub, GitLab</td><td>✓ Adapter</td></tr>
+  <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>SSO only</td></tr>
+  <tr><td>Kimai</td><td>time.*</td><td>SAML</td><td>Toggl, Harvest</td><td>SAML groups</td></tr>
+  <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>SSO only</td></tr>
+  <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>SSO only</td></tr>
+  <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>No accounts</td></tr>
+  <tr><td>Stalwart</td><td>mail.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+  <tr><td>MinIO</td><td>minio.*</td><td>Internal</td><td>AWS S3</td><td>No accounts</td></tr>
+</table>
+
+<h2>Notes</h2>
+<ul>
+  <li>OnlyOffice has no user accounts — it's embedded in Outline for document editing (Word/Excel/PowerPoint). Authenticated via shared JWT secret.</li>
+  <li>MinIO is the S3 backend for Outline's file storage. Not a user-facing app. Uses static admin credentials.</li>
+  <li>Vaultwarden uses the <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> fork — the official image doesn't support SSO.</li>
+  <li>Mattermost uses Enterprise Edition (free tier, no license needed) because Team Edition removed OAuth in v9.x.</li>
+  <li>Kimai maps SAML group claims to roles: <code>kimai-admin</code> → SUPER_ADMIN, <code>kimai-teamlead</code> → TEAMLEAD.</li>
+</ul>

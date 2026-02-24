@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Adapters y Webhooks</h1>
+<p class="subtitle">Cómo los eventos de Authentik se propagan a cada aplicación en tiempo real.</p>
+
+<h2>¿Qué Son los Adapters?</h2>
+<p>Los adapters son microservicios ligeros en Python (FastAPI) que actúan como traductores entre Authentik y cada aplicación. Cuando algo ocurre en Authentik (se crea un grupo, un usuario inicia sesión), Authentik envía un webhook HTTP a los adapters correspondientes, que luego llaman a la API de la aplicación destino.</p>
+<pre><code>Authentik event
+    │
+    ├──webhook──→ outline-adapter ──API──→ Outline
+    ├──webhook──→ mattermost-adapter ──API──→ Mattermost
+    ├──webhook──→ gitea-adapter ──API──→ Gitea
+    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+
+<h2>Eventos Webhook</h2>
+<table>
+  <tr><th>Evento</th><th>Desencadenante</th><th>Acción del Adapter</th></tr>
+  <tr><td><code>model_created</code> (group)</td><td>Nuevo grupo creado en Authentik</td><td>Crear organización/canal/grupo/lista de correo</td></tr>
+  <tr><td><code>model_updated</code> (group)</td><td>Membresía del grupo modificada</td><td>Sincronizar membresía con la aplicación</td></tr>
+  <tr><td><code>model_deleted</code> (group)</td><td>Grupo eliminado</td><td>Eliminar el recurso correspondiente</td></tr>
+  <tr><td><code>user_login</code></td><td>Usuario inicia sesión en cualquier aplicación</td><td>Aplicar membresías pendientes, buzón JIT</td></tr>
+</table>
+
+<h2>Cola de Pendientes</h2>
+<p>Cada adapter mantiene una base de datos SQLite para las membresías pendientes. Si un usuario es añadido a un grupo pero no ha iniciado sesión en la aplicación destino (no existe una cuenta local), la membresía se pone en cola. En el siguiente inicio de sesión, todas las membresías pendientes se aplican.</p>
+
+<h2>Endpoints del Adapter</h2>
+<pre><code>POST /webhook    — Receives Authentik events
+GET  /health     — Liveness probe (returns 200)
+GET  /pending    — Lists queued pending operations</code></pre>
+
+<h2>Base Compartida</h2>
+<p>Todos los adapters comparten <code>apps/_shared/adapter_base.py</code> que proporciona:</p>
+<ul>
+  <li>Inicialización de base de datos SQLite y gestión de la cola de pendientes</li>
+  <li>Análisis de los payloads de webhook</li>
+  <li><code>load_role_mapping()</code> — analiza la variable de entorno <code>ROLE_MAPPING</code></li>
+  <li><code>get_group_role()</code> — resuelve un nombre de grupo a su rol específico de aplicación (o None para exclusión)</li>
+</ul>

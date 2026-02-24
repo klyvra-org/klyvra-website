@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Adapters & Webhooks</h1>
+<p class="subtitle">Wie Authentik-Ereignisse in Echtzeit an jede App weitergegeben werden.</p>
+
+<h2>Was sind Adapters?</h2>
+<p>Adapters sind leichtgewichtige Python-(FastAPI)-Microservices, die als Übersetzer zwischen Authentik und den jeweiligen Apps fungieren. Wenn etwas in Authentik passiert (eine Gruppe wird erstellt, ein Benutzer meldet sich an), sendet Authentik einen HTTP-Webhook an die relevanten adapters, die dann die API der Ziel-App aufrufen.</p>
+<pre><code>Authentik event
+    │
+    ├──webhook──→ outline-adapter ──API──→ Outline
+    ├──webhook──→ mattermost-adapter ──API──→ Mattermost
+    ├──webhook──→ gitea-adapter ──API──→ Gitea
+    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+
+<h2>Webhook-Ereignisse</h2>
+<table>
+  <tr><th>Ereignis</th><th>Auslöser</th><th>Adapter-Aktion</th></tr>
+  <tr><td><code>model_created</code> (group)</td><td>Neue Gruppe in Authentik erstellt</td><td>Organisation/Kanal/Gruppe/Mailingliste erstellen</td></tr>
+  <tr><td><code>model_updated</code> (group)</td><td>Gruppenmitgliedschaft geändert</td><td>Mitgliedschaft mit App synchronisieren</td></tr>
+  <tr><td><code>model_deleted</code> (group)</td><td>Gruppe gelöscht</td><td>Entsprechende Ressource löschen</td></tr>
+  <tr><td><code>user_login</code></td><td>Benutzer meldet sich bei einer App an</td><td>Ausstehende Mitgliedschaften anwenden, JIT-Postfach erstellen</td></tr>
+</table>
+
+<h2>Warteschlange für ausstehende Operationen</h2>
+<p>Jeder adapter führt eine SQLite-Datenbank für ausstehende Mitgliedschaften. Wenn ein Benutzer einer Gruppe hinzugefügt wird, aber sich noch nicht bei der Ziel-App angemeldet hat (kein lokales Konto existiert), wird die Mitgliedschaft in die Warteschlange gestellt. Beim nächsten Login werden alle ausstehenden Mitgliedschaften angewendet.</p>
+
+<h2>Adapter-Endpunkte</h2>
+<pre><code>POST /webhook    — Receives Authentik events
+GET  /health     — Liveness probe (returns 200)
+GET  /pending    — Lists queued pending operations</code></pre>
+
+<h2>Gemeinsame Basis</h2>
+<p>Alle adapters teilen sich <code>apps/_shared/adapter_base.py</code>, das Folgendes bereitstellt:</p>
+<ul>
+  <li>SQLite-Datenbankinitialisierung und Verwaltung der Warteschlange</li>
+  <li>Webhook-Payload-Parsing</li>
+  <li><code>load_role_mapping()</code> — parst die <code>ROLE_MAPPING</code>-Umgebungsvariable</li>
+  <li><code>get_group_role()</code> — löst einen Gruppennamen in die app-spezifische Rolle auf (oder None für Ausschluss)</li>
+</ul>

@@ -1,0 +1,64 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Adicionar Utilizadores e Grupos</h1>
+<p class="subtitle">Passo a passo: crie a estrutura de utilizadores da sua empresa no Authentik.</p>
+
+<h2><span class="step-number">1</span> Planear os Seus Grupos</h2>
+<p>Pense nas funções da sua empresa. Cada grupo mapeia um conjunto de permissões em todas as aplicações. Exemplos comuns:</p>
+<table>
+  <tr><th>Grupo</th><th>Quem pertence</th><th>O que obtêm</th></tr>
+  <tr><td><code>engineering</code></td><td>Programadores, DevOps</td><td>Acesso total ao código, wiki leitura/escrita, quadros de tarefas</td></tr>
+  <tr><td><code>management</code></td><td>Team leads, executivos</td><td>Wiki admin, aprovação de folhas de horas, código apenas leitura</td></tr>
+  <tr><td><code>hr</code></td><td>Equipa de RH</td><td>Wiki admin, aprovação de folhas de horas, SEM acesso ao código</td></tr>
+  <tr><td><code>design</code></td><td>Designers</td><td>Acesso a ficheiros, wiki leitura/escrita, quadros de tarefas</td></tr>
+</table>
+
+<h2><span class="step-number">2</span> Criar Grupos no Authentik</h2>
+<ol>
+  <li>Abra o admin do Authentik: <a href="http://auth.localhost/if/admin/#/identity/groups">auth.localhost/if/admin → Directory → Groups</a></li>
+  <li>Clique em <strong>Create</strong></li>
+  <li>Introduza o nome do grupo (ex.: <code>engineering</code>)</li>
+  <li>Clique em <strong>Create</strong></li>
+</ol>
+<p>Em segundos, os 4 adapters recebem um webhook e criam os recursos correspondentes:</p>
+<ul>
+  <li>Gitea: organização <code>engineering</code></li>
+  <li>Mattermost: canal <code>engineering</code></li>
+  <li>Outline: grupo <code>engineering</code></li>
+  <li>Stalwart: lista de distribuição <code>engineering@seudominio.com</code></li>
+</ul>
+
+<h2><span class="step-number">3</span> Criar Utilizadores</h2>
+<ol>
+  <li>Aceda a <strong>Directory → Users</strong> no admin do Authentik</li>
+  <li>Clique em <strong>Create</strong></li>
+  <li>Preencha: username, nome de exibição, e-mail</li>
+  <li>Defina uma palavra-passe temporária (o utilizador pode alterar no primeiro login)</li>
+  <li>Clique em <strong>Create</strong></li>
+</ol>
+
+<h2><span class="step-number">4</span> Adicionar Utilizadores a Grupos</h2>
+<ol>
+  <li>Abra o utilizador que acabou de criar</li>
+  <li>Aceda ao separador <strong>Groups</strong></li>
+  <li>Clique em <strong>Add to existing group</strong></li>
+  <li>Selecione o(s) grupo(s) a que este utilizador pertence</li>
+</ol>
+
+<div class="callout callout-tip">
+  <strong>💡 O que acontece a seguir</strong>
+  O Authentik dispara um webhook. Se o utilizador já tiver feito login numa aplicação, é imediatamente adicionado ao grupo/canal/organização. Se ainda não tiver feito login, a adesão fica em fila de espera e é aplicada automaticamente no primeiro login.
+</div>
+
+<h2><span class="step-number">5</span> Informar os Utilizadores para Fazerem Login</h2>
+<p>Partilhe os URLs das aplicações com os seus utilizadores. No primeiro login em qualquer aplicação via SSO:</p>
+<ol>
+  <li>Uma conta local é criada automaticamente na aplicação</li>
+  <li>Todas as adesões a grupos pendentes são aplicadas</li>
+  <li>Se o Stalwart estiver ativado, uma caixa de correio é provisionada automaticamente</li>
+  <li>Se o onboarding do Mattermost estiver ativado, recebem uma mensagem de boas-vindas com links de comunicação</li>
+</ol>

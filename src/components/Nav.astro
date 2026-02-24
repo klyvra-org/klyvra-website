@@ -1,0 +1,26 @@
+---
+import { t, localizedPath } from '../i18n/index';
+import type { Locale } from '../i18n/locales';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+interface Props {
+  locale: Locale;
+  currentPath: string;
+  activePage?: 'home' | 'features' | 'docs';
+}
+
+const { locale, currentPath, activePage } = Astro.props;
+---
+
+<nav>
+  <a href={localizedPath(locale, '/')} class="logo">
+    <img src="/assets/logo.png" alt="Klyvra">
+  </a>
+  <div class="links">
+    <a href={localizedPath(locale, '/')} class={activePage === 'home' ? 'active' : ''}>{t(locale, 'common.nav_home')}</a>
+    <a href={localizedPath(locale, '/features')} class={activePage === 'features' ? 'active' : ''}>{t(locale, 'common.nav_features')}</a>
+    <a href={localizedPath(locale, '/docs')} class={activePage === 'docs' ? 'active' : ''} style="color:var(--teal);">{t(locale, 'common.nav_docs')}</a>
+    <LanguageSwitcher locale={locale} currentPath={currentPath} />
+    <a href="https://github.com/klyvra-org/klyvra" class="btn btn-primary">{t(locale, 'common.nav_get_started')}</a>
+  </div>
+</nav>

@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Adapters & Webhooks</h1>
+<p class="subtitle">Comment les événements Authentik se propagent à chaque application en temps réel.</p>
+
+<h2>Que sont les adapters ?</h2>
+<p>Les adapters sont des microservices légers Python (FastAPI) qui servent de traducteurs entre Authentik et chaque application. Lorsque quelque chose se produit dans Authentik (un groupe est créé, un utilisateur se connecte), Authentik envoie un webhook HTTP aux adapters concernés, qui appellent ensuite l'API de l'application cible.</p>
+<pre><code>Authentik event
+    │
+    ├──webhook──→ outline-adapter ──API──→ Outline
+    ├──webhook──→ mattermost-adapter ──API──→ Mattermost
+    ├──webhook──→ gitea-adapter ──API──→ Gitea
+    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+
+<h2>Événements webhook</h2>
+<table>
+  <tr><th>Événement</th><th>Déclencheur</th><th>Action de l'adapter</th></tr>
+  <tr><td><code>model_created</code> (group)</td><td>Nouveau groupe créé dans Authentik</td><td>Créer org/canal/groupe/liste de diffusion</td></tr>
+  <tr><td><code>model_updated</code> (group)</td><td>Adhésion au groupe modifiée</td><td>Synchroniser l'adhésion avec l'application</td></tr>
+  <tr><td><code>model_deleted</code> (group)</td><td>Groupe supprimé</td><td>Supprimer la ressource correspondante</td></tr>
+  <tr><td><code>user_login</code></td><td>Utilisateur se connecte à une application</td><td>Appliquer les adhésions en attente, boîte mail JIT</td></tr>
+</table>
+
+<h2>File d'attente</h2>
+<p>Chaque adapter maintient une base de données SQLite pour les adhésions en attente. Si un utilisateur est ajouté à un groupe mais ne s'est pas encore connecté à l'application cible (aucun compte local n'existe), l'adhésion est mise en file d'attente. Lors de la prochaine connexion, toutes les adhésions en attente sont appliquées.</p>
+
+<h2>Points d'accès des adapters</h2>
+<pre><code>POST /webhook    — Receives Authentik events
+GET  /health     — Liveness probe (returns 200)
+GET  /pending    — Lists queued pending operations</code></pre>
+
+<h2>Base partagée</h2>
+<p>Tous les adapters partagent <code>apps/_shared/adapter_base.py</code> qui fournit :</p>
+<ul>
+  <li>Initialisation de la base de données SQLite et gestion de la file d'attente</li>
+  <li>Analyse des payloads webhook</li>
+  <li><code>load_role_mapping()</code> — parse la variable d'environnement <code>ROLE_MAPPING</code></li>
+  <li><code>get_group_role()</code> — résout un nom de groupe en son rôle spécifique à l'application (ou None pour l'exclusion)</li>
+</ul>

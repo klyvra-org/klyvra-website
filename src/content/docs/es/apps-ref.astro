@@ -1,0 +1,32 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Referencia de Aplicaciones</h1>
+<p class="subtitle">Las 10 aplicaciones de un vistazo — qué hacen, cómo se autentican y a qué reemplazan.</p>
+
+<table>
+  <tr><th>Aplicación</th><th>Subdominio</th><th>Autenticación</th><th>Reemplaza a</th><th>Sincronización de Grupos</th></tr>
+  <tr><td>Authentik</td><td>auth.*</td><td>Hub</td><td>Okta, Azure AD</td><td>—</td></tr>
+  <tr><td>Outline</td><td>docs.*</td><td>OIDC</td><td>Notion, Confluence</td><td>✓ Adapter</td></tr>
+  <tr><td>Mattermost</td><td>chat.*</td><td>OAuth2</td><td>Slack, Teams</td><td>✓ Adapter</td></tr>
+  <tr><td>Gitea</td><td>git.*</td><td>OIDC</td><td>GitHub, GitLab</td><td>✓ Adapter</td></tr>
+  <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>Solo SSO</td></tr>
+  <tr><td>Kimai</td><td>time.*</td><td>SAML</td><td>Toggl, Harvest</td><td>Grupos SAML</td></tr>
+  <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>Solo SSO</td></tr>
+  <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>Solo SSO</td></tr>
+  <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>Sin cuentas</td></tr>
+  <tr><td>Stalwart</td><td>mail.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+  <tr><td>MinIO</td><td>minio.*</td><td>Interno</td><td>AWS S3</td><td>Sin cuentas</td></tr>
+</table>
+
+<h2>Notas</h2>
+<ul>
+  <li>OnlyOffice no tiene cuentas de usuario — está integrado en Outline para la edición de documentos (Word/Excel/PowerPoint). Se autentica mediante un secreto JWT compartido.</li>
+  <li>MinIO es el backend S3 para el almacenamiento de archivos de Outline. No es una aplicación orientada al usuario. Usa credenciales de administrador estáticas.</li>
+  <li>Vaultwarden usa el fork <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> — la imagen oficial no soporta SSO.</li>
+  <li>Mattermost usa Enterprise Edition (nivel gratuito, sin licencia necesaria) porque Team Edition eliminó OAuth en v9.x.</li>
+  <li>Kimai mapea los claims de grupo SAML a roles: <code>kimai-admin</code> → SUPER_ADMIN, <code>kimai-teamlead</code> → TEAMLEAD.</li>
+</ul>

@@ -1,0 +1,44 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const caddyCode = `# Before:
+http://auth.{$DOMAIN}:{$HTTP_PORT} { ... }
+
+# After (Caddy auto-enables HTTPS):
+auth.{$DOMAIN} { ... }`;
+---
+
+<h1>Custom Domain & TLS</h1>
+<p class="subtitle">Move from localhost to a real domain with automatic HTTPS.</p>
+
+<h2>Setting a Custom Domain</h2>
+<pre><code>make destroy                            # Clean slate
+make bootstrap DOMAIN=company.com       # Generate .env with your domain
+make up                                 # Start everything</code></pre>
+<p>All services become <code>auth.company.com</code>, <code>docs.company.com</code>, <code>chat.company.com</code>, etc.</p>
+
+<h2>DNS Setup</h2>
+<p>Point a wildcard DNS record to your server:</p>
+<pre><code>*.company.com    A    → your-server-ip</code></pre>
+<p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>mail</code>, <code>office</code>, <code>minio</code>.</p>
+
+<h2>Enabling TLS (HTTPS)</h2>
+<p>Caddy supports automatic Let's Encrypt certificates. To enable:</p>
+
+<h3><span class="step-number">1</span> Edit the Caddyfile</h3>
+<p>Open <code>apps/caddy/Caddyfile</code> and remove the <code>auto_https off</code> line. Change the protocol from <code>http://</code> to bare domain matching:</p>
+<pre><code set:text={caddyCode} /></pre>
+
+<h3><span class="step-number">2</span> Update ports</h3>
+<p>In <code>compose.yaml</code>, expose ports 80 and 443 on Caddy for HTTP→HTTPS redirect and TLS respectively.</p>
+
+<h3><span class="step-number">3</span> Restart</h3>
+<pre><code>make down && make up</code></pre>
+<p>Caddy automatically obtains and renews Let's Encrypt certificates for all subdomains.</p>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Firewall</strong>
+  Ports 80 and 443 must be reachable from the internet for Let's Encrypt HTTP-01 challenges. If behind a firewall, consider using DNS-01 challenges instead.
+</div>

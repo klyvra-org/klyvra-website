@@ -1,0 +1,53 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Fehlerbehebung</h1>
+<p class="subtitle">Häufige Probleme und deren Lösung.</p>
+
+<h2>Port 80 belegt</h2>
+<pre><code>make bootstrap HTTP_PORT=8080
+make up</code></pre>
+
+<h2>Veraltete Volumes nach erneutem Bootstrap</h2>
+<p>Wenn Sie <code>make bootstrap</code> erneut ausführen (wodurch Passwörter neu generiert werden), enthalten bestehende Datenbank-Volumes noch die alten Passwörter:</p>
+<pre><code>make destroy        # removes containers AND volumes
+make bootstrap      # fresh .env
+make up             # clean start</code></pre>
+
+<h2>*.localhost wird nicht aufgelöst</h2>
+<p>Die meisten modernen Systeme lösen <code>*.localhost</code> zu <code>127.0.0.1</code> auf (RFC 6761). Wenn Ihr Browser die URLs nicht erreicht, fügen Sie Einträge in <code>/etc/hosts</code> hinzu:</p>
+<pre><code># /etc/hosts
+127.0.0.1 auth.localhost docs.localhost chat.localhost git.localhost
+127.0.0.1 files.localhost time.localhost tasks.localhost vault.localhost
+127.0.0.1 mail.localhost office.localhost minio.localhost</code></pre>
+
+<h2>Dienst startet nicht</h2>
+<pre><code>docker compose logs &lt;service-name&gt;    # Check logs
+docker compose ps -a                    # Check exit codes
+make logs SVC=&lt;service-name&gt;           # Follow logs</code></pre>
+
+<h2>SSO-Button fehlt in Seafile</h2>
+<p>Die OAuth-Konfiguration von Seafile wird zur Laufzeit durch ein eingebettetes Boot-Skript gepatcht. Wenn der SSO-Button fehlt:</p>
+<pre><code>docker logs klyvra-seafile-1 2>&1 | grep oauth-boot</code></pre>
+
+<h2>Vaultwarden SSO funktioniert nicht</h2>
+<p>Klyvra verwendet <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> (<code>timshel/oidcwarden:latest</code>), nicht das offizielle Vaultwarden-Image. Das offizielle Image ignoriert <code>SSO_*</code>-Umgebungsvariablen stillschweigend. OIDCWarden erfordert nach dem SSO-Login weiterhin ein Master-Passwort (beabsichtigt — es verschlüsselt Ihren Tresor).</p>
+
+<h2>Mattermost zeigt „GitLab" als SSO-Provider</h2>
+<p>Das ist erwartetes Verhalten. Die kostenlose Stufe von Mattermost unterstützt nur „GitLab" als OAuth2-Provider-Typ. Authentik ist so konfiguriert, dass es GitLabs Userinfo-Format emuliert, sodass es transparent funktioniert. Der Button sagt „GitLab", leitet aber tatsächlich zu Authentik weiter.</p>
+
+<h2>Init container startet immer wieder neu</h2>
+<p>Init containers verwenden <code>restart: on-failure</code> und wiederholen den Vorgang, bis ihre Ziel-App bereit ist. Prüfen Sie, ob die Ziel-App gesund ist:</p>
+<pre><code>docker compose ps        # Look for unhealthy services
+make status              # Full status dashboard</code></pre>
+
+<h2>Adapter-Health prüfen</h2>
+<pre><code># View adapter logs
+make logs SVC=outline-adapter
+make logs SVC=gitea-adapter
+
+# Check pending queue
+docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>

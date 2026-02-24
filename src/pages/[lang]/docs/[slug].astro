@@ -1,0 +1,38 @@
+---
+import DocsLayout from '../../../layouts/DocsLayout.astro';
+import { t } from '../../../i18n/index';
+import { locales, defaultLocale, type Locale } from '../../../i18n/locales';
+import { allDocSlugs, docsNav } from '../../../data/docs-nav';
+
+export function getStaticPaths() {
+  const paths = [];
+  for (const lang of locales) {
+    if (lang === defaultLocale) continue;
+    for (const slug of allDocSlugs) {
+      paths.push({ params: { lang, slug } });
+    }
+  }
+  return paths;
+}
+
+const locale = Astro.params.lang as Locale;
+const { slug } = Astro.params;
+
+// Try locale-specific content first, fall back to English
+const localizedModules = import.meta.glob('../../../content/docs/**/*.astro');
+const localePath = `../../../content/docs/${locale}/${slug}.astro`;
+const fallbackPath = `../../../content/docs/en/${slug}.astro`;
+
+const mod = localizedModules[localePath] ?? localizedModules[fallbackPath];
+if (!mod) {
+  return Astro.redirect(`/${locale}/docs`);
+}
+const DocContent = (await mod() as any).default;
+
+const navItem = docsNav.flatMap(g => g.items).find(i => i.slug === slug);
+const pageTitle = navItem ? t(locale, navItem.titleKey) : slug;
+---
+
+<DocsLayout title={`${pageTitle} — Klyvra Docs`} locale={locale} currentPath={`/${locale}/docs/${slug}`} currentSlug={slug}>
+  <DocContent locale={locale} />
+</DocsLayout>

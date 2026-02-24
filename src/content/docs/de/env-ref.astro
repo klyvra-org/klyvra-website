@@ -1,0 +1,37 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Umgebungsvariablen</h1>
+<p class="subtitle">Die gesamte Konfiguration befindet sich in <code>.env</code>, generiert durch <code>make bootstrap</code>.</p>
+
+<h2>Benutzerkonfigurierbar</h2>
+<table>
+  <tr><th>Variable</th><th>Standard</th><th>Beschreibung</th></tr>
+  <tr><td><code>DOMAIN</code></td><td><code>localhost</code></td><td>Basisdomain — alle Subdomains werden davon abgeleitet</td></tr>
+  <tr><td><code>HTTP_PORT</code></td><td><code>80</code></td><td>Port, auf dem Caddy lauscht</td></tr>
+  <tr><td><code>MATTERMOST_TEAM_NAME</code></td><td><code>main</code></td><td>Standard-Mattermost-Teamname</td></tr>
+  <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>/comms-, /mail-, /calendar-Slash-Befehle erstellen</td></tr>
+  <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Willkommens-DM mit Kommunikationslinks beim ersten Login senden</td></tr>
+  <tr><td><code>MAIL_URL</code></td><td><code>{"http://mail.${DOMAIN}"}</code></td><td>Ziel-URL für Mail-Weiterleitung</td></tr>
+  <tr><td><code>CALENDAR_URL</code></td><td><code>{"http://calendar.${DOMAIN}"}</code></td><td>Ziel-URL für Kalender-Weiterleitung</td></tr>
+  <tr><td><code>CONTACTS_URL</code></td><td><code>{"http://contacts.${DOMAIN}"}</code></td><td>Ziel-URL für Kontakte-Weiterleitung</td></tr>
+</table>
+
+<h2>Automatisch generiert (nicht ändern)</h2>
+<p><code>make bootstrap</code> generiert über 30 Secrets mit <code>openssl rand</code>. Dazu gehören:</p>
+<ul>
+  <li>Datenbank-Passwörter für alle 7 Datenbanken</li>
+  <li>OIDC-Client-Secrets für alle 7 OIDC-Provider</li>
+  <li>Authentik Secret Key, Bootstrap-Token</li>
+  <li>MinIO-Root-Passwort</li>
+  <li>OnlyOffice JWT Secret</li>
+  <li>Stalwart-Admin-Passwort</li>
+</ul>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Nicht erneut bootstrappen mit vorhandenen Daten</strong>
+  Wenn Sie <code>make bootstrap</code> erneut ausführen, werden alle Passwörter neu generiert. Bestehende Datenbank-Volumes enthalten noch die alten Passwörter. Führen Sie zuerst <code>make destroy</code> aus, um die Volumes zu löschen.
+</div>

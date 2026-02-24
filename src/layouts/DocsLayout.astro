@@ -1,0 +1,24 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import DocsSidebar from '../components/docs/DocsSidebar.astro';
+import type { Locale } from '../i18n/locales';
+import '../styles/docs.css';
+
+interface Props {
+  title: string;
+  locale: Locale;
+  currentPath: string;
+  currentSlug?: string;
+}
+
+const { title, locale, currentPath, currentSlug } = Astro.props;
+---
+
+<BaseLayout title={title} locale={locale} currentPath={currentPath} activePage="docs" footerVariant="docs">
+  <div class="docs-layout">
+    <DocsSidebar locale={locale} currentSlug={currentSlug} />
+    <main class="doc-content">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

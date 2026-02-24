@@ -1,0 +1,55 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Quick Start Guide</h1>
+<p class="subtitle">From zero to a running productivity suite in under 5 minutes.</p>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>Docker Engine ≥ 24.0 with Compose v2 (Docker Desktop works too)</li>
+  <li><code>openssl</code> and <code>make</code> (pre-installed on most Linux/macOS systems)</li>
+  <li>8 GB RAM minimum — all 10 apps plus their databases run simultaneously</li>
+  <li>Port 80 free (or choose another port — see below)</li>
+</ul>
+
+<h2>Three Commands</h2>
+<h3><span class="step-number">1</span> Clone the repository</h3>
+<pre><code>git clone https://github.com/klyvra-org/klyvra.git && cd klyvra</code></pre>
+
+<h3><span class="step-number">2</span> Generate configuration</h3>
+<pre><code>make bootstrap</code></pre>
+<p>This creates a <code>.env</code> file with 30+ randomly generated secrets (database passwords, OIDC client secrets, API keys). You never need to touch these.</p>
+
+<div class="callout callout-tip">
+  <strong>💡 Custom port?</strong>
+  If port 80 is taken, run <code>make bootstrap HTTP_PORT=8080</code> instead. All URLs will include the port automatically.
+</div>
+
+<h3><span class="step-number">3</span> Start everything</h3>
+<pre><code>make up</code></pre>
+<p>This builds custom images, starts 33 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
+
+<h2>What You Get</h2>
+<p>When <code>make up</code> finishes, these URLs are live:</p>
+
+<table>
+  <tr><th>App</th><th>URL</th><th>What it does</th></tr>
+  <tr><td>Authentik</td><td><a href="http://auth.localhost">auth.localhost</a></td><td>Identity & SSO admin</td></tr>
+  <tr><td>Outline</td><td><a href="http://docs.localhost">docs.localhost</a></td><td>Wiki & knowledge base</td></tr>
+  <tr><td>Mattermost</td><td><a href="http://chat.localhost">chat.localhost</a></td><td>Team chat & channels</td></tr>
+  <tr><td>Gitea</td><td><a href="http://git.localhost">git.localhost</a></td><td>Git hosting & CI/CD</td></tr>
+  <tr><td>Seafile</td><td><a href="http://files.localhost">files.localhost</a></td><td>File sync & share</td></tr>
+  <tr><td>Kimai</td><td><a href="http://time.localhost">time.localhost</a></td><td>Time tracking</td></tr>
+  <tr><td>Vikunja</td><td><a href="http://tasks.localhost">tasks.localhost</a></td><td>Task management</td></tr>
+  <tr><td>Vaultwarden</td><td><a href="http://vault.localhost">vault.localhost</a></td><td>Password manager</td></tr>
+  <tr><td>Stalwart</td><td><a href="http://mail.localhost">mail.localhost</a></td><td>Email, calendar, contacts</td></tr>
+  <tr><td>OnlyOffice</td><td><a href="http://office.localhost">office.localhost</a></td><td>Document editing</td></tr>
+</table>
+
+<div class="callout callout-info">
+  <strong>ℹ️ Next step</strong>
+  Head to the <a href="/docs/first-login">Your First Login</a> guide to create your admin account and start using the suite.
+</div>

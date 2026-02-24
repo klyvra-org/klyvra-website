@@ -1,0 +1,59 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Ihr erster Login</h1>
+<p class="subtitle">Admin-Konto erstellen, den SSO-Ablauf verstehen und sich bei jeder App anmelden.</p>
+
+<h2><span class="step-number">1</span> Authentik-Admin erstellen</h2>
+<p>Öffnen Sie <a href="http://auth.localhost/if/flow/initial-setup/">http://auth.localhost/if/flow/initial-setup/</a> in Ihrem Browser.</p>
+<p>Sie sehen ein einmaliges Setup-Formular. Erstellen Sie Ihr Admin-Konto mit einem sicheren Passwort. Dies ist der einzige manuelle Schritt im gesamten Setup.</p>
+
+<div class="callout callout-warn">
+  <strong>⚠️ Zugangsdaten sichern</strong>
+  Dies ist das Authentik-Admin-Konto. Wenn Sie es verlieren, müssen Sie es über die Datenbank zurücksetzen. Speichern Sie es am besten in Vaultwarden, sobald es läuft!
+</div>
+
+<h2><span class="step-number">2</span> Admin-Panel erkunden</h2>
+<p>Nach der Erstellung Ihres Kontos navigieren Sie zu <a href="http://auth.localhost/if/admin/">http://auth.localhost/if/admin/</a>. Sie sehen:</p>
+<ul>
+  <li>Applications — alle 10 Apps sind vorkonfiguriert (durch blueprints erledigt)</li>
+  <li>Providers — 7 OIDC + 1 SAML Provider, alle eingerichtet</li>
+  <li>Users — bisher nur Ihr Admin-Konto</li>
+  <li>Groups — bereit für die Erstellung Ihrer Unternehmensstruktur</li>
+</ul>
+
+<h2><span class="step-number">3</span> Bei einer App anmelden</h2>
+<p>Öffnen Sie eine beliebige App-URL, z. B. <a href="http://docs.localhost">docs.localhost</a> (Outline). Sie sehen eine Anmeldeseite mit einem SSO-Button:</p>
+<ul>
+  <li>Outline → „Continue with OIDC"</li>
+  <li>Mattermost → „GitLab" (eigentlich Authentik — Mattermost nennt alle OAuth2-Anbieter „GitLab")</li>
+  <li>Gitea → „Sign in with Authentik"</li>
+  <li>Seafile → „Single Sign-On"</li>
+  <li>Kimai → „Login with Authentik"</li>
+  <li>Vikunja → „Authentik"</li>
+  <li>Vaultwarden → „Enterprise Single Sign-On" (beliebige E-Mail eingeben → SSO leitet zu Authentik weiter)</li>
+</ul>
+<p>Klicken Sie den SSO-Button → Sie werden zu Authentik weitergeleitet → anmelden → zurück zur App, eingeloggt. Das ist der Ablauf für alle Apps.</p>
+
+<div class="callout callout-tip">
+  <strong>💡 Auto-Provisioning</strong>
+  Sie müssen in keiner App manuell Konten anlegen. Beim ersten Login via SSO wird automatisch ein lokales Konto in der jeweiligen App mit Ihrer Authentik-E-Mail und Ihrem Anzeigenamen erstellt.
+</div>
+
+<h2><span class="step-number">4</span> Stalwart Mail</h2>
+<p>Stalwart funktioniert etwas anders — Postfächer werden beim ersten SSO-Login automatisch erstellt (JIT-Provisioning). Nach dem Login unter <a href="http://mail.localhost">mail.localhost</a> ist Ihr Postfach für IMAP/SMTP erreichbar:</p>
+<ul>
+  <li>IMAP: <code>mail.localhost:143</code></li>
+  <li>SMTP: <code>mail.localhost:587</code></li>
+  <li>Benutzername: Ihre Authentik-E-Mail-Adresse</li>
+</ul>
+
+<h2><span class="step-number">5</span> Wie geht es weiter?</h2>
+<p>Nachdem Sie sich anmelden können, ist der nächste Schritt die Einrichtung Ihrer Unternehmens-Gruppenstruktur:</p>
+<ul>
+  <li><a href="/docs/add-users">Benutzer & Gruppen hinzufügen</a> — echte Benutzer erstellen und Gruppen zuweisen</li>
+  <li><a href="/docs/rbac">RBAC & Gruppen-Mapping</a> — verstehen, wie Gruppen auf App-spezifische Berechtigungen übertragen werden</li>
+</ul>

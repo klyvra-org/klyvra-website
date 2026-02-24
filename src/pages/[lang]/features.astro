@@ -1,0 +1,267 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t, localizedPath } from '../../i18n/index';
+import { locales, defaultLocale, type Locale } from '../../i18n/locales';
+import '../../styles/features.css';
+
+export function getStaticPaths() {
+  return locales
+    .filter(l => l !== defaultLocale)
+    .map(lang => ({ params: { lang } }));
+}
+
+const locale = Astro.params.lang as Locale;
+---
+
+<BaseLayout title={t(locale, 'features.meta_title')} locale={locale} currentPath={`/${locale}/features`} activePage="features">
+
+  <!-- HERO -->
+  <section class="features-hero">
+    <h1><Fragment set:html={t(locale, 'features.hero_title')} /></h1>
+    <p>{t(locale, 'features.hero_subtitle')}</p>
+    <div class="hero-ctas">
+      <a href="#sso" class="btn btn-primary">{t(locale, 'features.hero_cta_how')}</a>
+      <a href="https://github.com/klyvra-org/klyvra" class="btn btn-outline">{t(locale, 'features.hero_cta_github')}</a>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="alt-bg">
+    <div class="container">
+      <div class="stats fade-in">
+        <div><div class="stat-number">10</div><div class="stat-label">{t(locale, 'features.stat_apps')}</div></div>
+        <div><div class="stat-number">1</div><div class="stat-label">{t(locale, 'features.stat_login')}</div></div>
+        <div><div class="stat-number">0</div><div class="stat-label">{t(locale, 'features.stat_config')}</div></div>
+        <div><div class="stat-number">&infin;</div><div class="stat-label">{t(locale, 'features.stat_users')}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1: SSO -->
+  <section id="sso">
+    <div class="container">
+      <div class="feature-block fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.sso_tag')}</div>
+          <h3>{t(locale, 'features.sso_title')}</h3>
+          <p>{t(locale, 'features.sso_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.sso_check1')}</li>
+            <li>{t(locale, 'features.sso_check2')}</li>
+            <li>{t(locale, 'features.sso_check3')}</li>
+            <li>{t(locale, 'features.sso_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--gray); margin-bottom:0.75rem;">{t(locale, 'features.sso_visual_label')}</div>
+          <div style="padding:1.2rem; background:var(--light); border-radius:10px; text-align:center; margin-bottom:1rem;">
+            <div style="font-size:1.5rem; margin-bottom:0.5rem;">🔐</div>
+            <div style="font-weight:600; margin-bottom:0.3rem;">Sign in to Klyvra</div>
+            <div style="background:var(--white); border:1px solid #ddd; border-radius:6px; padding:0.5rem; margin:0.5rem auto; max-width:250px; color:var(--gray); text-align:left;">alice@company.com</div>
+            <div style="background:var(--gradient); color:white; border-radius:6px; padding:0.5rem; max-width:250px; margin:0.5rem auto; font-weight:600;">Sign in</div>
+          </div>
+          <div style="color:var(--teal); text-align:center;">{t(locale, 'features.sso_visual_redirect')}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2: PERMISSIONS -->
+  <section class="dark-bg" id="permissions">
+    <div class="container">
+      <div class="feature-block reverse fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.perms_tag')}</div>
+          <h3>{t(locale, 'features.perms_title')}</h3>
+          <p>{t(locale, 'features.perms_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.perms_check1')}</li>
+            <li>{t(locale, 'features.perms_check2')}</li>
+            <li>{t(locale, 'features.perms_check3')}</li>
+            <li>{t(locale, 'features.perms_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--teal); margin-bottom:0.75rem;">{t(locale, 'features.perms_visual_label')}</div>
+          <div style="text-align:left; line-height:2;">
+            <div><span style="color:var(--teal);">engineering:</span></div>
+            <div>&nbsp;&nbsp;gitea: <span style="color:#7ec8e3;">owner</span> <span style="opacity:0.4;">&nbsp;# full repo access</span></div>
+            <div>&nbsp;&nbsp;outline: <span style="color:#7ec8e3;">member</span> <span style="opacity:0.4;">&nbsp;# wiki read/write</span></div>
+            <div>&nbsp;&nbsp;kimai: <span style="color:#7ec8e3;">user</span> <span style="opacity:0.4;">&nbsp;# track own time</span></div>
+            <div style="margin-top:0.5rem;"><span style="color:var(--teal);">hr:</span></div>
+            <div>&nbsp;&nbsp;gitea: <span style="color:#e74c3c;">null</span> <span style="opacity:0.4;">&nbsp;# no code access</span></div>
+            <div>&nbsp;&nbsp;outline: <span style="color:#7ec8e3;">admin</span> <span style="opacity:0.4;">&nbsp;# wiki admin</span></div>
+            <div>&nbsp;&nbsp;kimai: <span style="color:#7ec8e3;">teamlead</span> <span style="opacity:0.4;">&nbsp;# approve timesheets</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 3: ZERO CLICKOPS -->
+  <section id="zero-config">
+    <div class="container">
+      <div class="feature-block fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.zero_tag')}</div>
+          <h3>{t(locale, 'features.zero_title')}</h3>
+          <p>{t(locale, 'features.zero_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.zero_check1')}</li>
+            <li>{t(locale, 'features.zero_check2')}</li>
+            <li>{t(locale, 'features.zero_check3')}</li>
+            <li>{t(locale, 'features.zero_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--gray); margin-bottom:0.75rem;">{t(locale, 'features.zero_visual_label')}</div>
+          <div style="background:#1a1e2e; color:#e0e0e0; border-radius:10px; padding:1.2rem; font-size:0.85rem; line-height:1.8;">
+            <div style="color:var(--gray);">$</div>
+            <div>git clone github.com/klyvra-org/klyvra</div>
+            <div>cd klyvra</div>
+            <div>make bootstrap DOMAIN=company.com</div>
+            <div>make up</div>
+            <div style="margin-top:0.5rem; color:var(--teal);">✓ 33 containers running</div>
+            <div style="color:var(--teal);">✓ SSO configured for 10 apps</div>
+            <div style="color:var(--teal);">✓ Webhooks armed, adapters listening</div>
+            <div style="color:var(--teal);">✓ Ready at https://auth.company.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 4: DEPLOY ANYWHERE -->
+  <section class="alt-bg" id="deploy">
+    <div class="container">
+      <div class="feature-block reverse fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.deploy_tag')}</div>
+          <h3>{t(locale, 'features.deploy_title')}</h3>
+          <p>{t(locale, 'features.deploy_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.deploy_check1')}</li>
+            <li>{t(locale, 'features.deploy_check2')}</li>
+            <li><Fragment set:html={t(locale, 'features.deploy_check3')} /></li>
+            <li>{t(locale, 'features.deploy_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--gray); margin-bottom:0.75rem;">{t(locale, 'features.deploy_visual_label')}</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+            <div style="background:var(--light); border-radius:10px; padding:1.2rem; text-align:center;">
+              <div style="font-size:2rem; margin-bottom:0.5rem;">🐳</div>
+              <div style="font-weight:700; margin-bottom:0.3rem;">Docker Compose</div>
+              <div style="font-size:0.8rem; color:var(--gray);">Single server<br>Dev & small teams<br><code>make up</code></div>
+            </div>
+            <div style="background:var(--light); border-radius:10px; padding:1.2rem; text-align:center;">
+              <div style="font-size:2rem; margin-bottom:0.5rem;">☸️</div>
+              <div style="font-weight:700; margin-bottom:0.3rem;">Kubernetes</div>
+              <div style="font-size:0.8rem; color:var(--gray);">Multi-node clusters<br>Production scale<br><code>helm install</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENARIOS -->
+  <section class="dark-bg" id="scenarios">
+    <div class="container">
+      <div class="section-title">
+        <h2>{t(locale, 'features.scenarios_title')}</h2>
+        <p>{t(locale, 'features.scenarios_subtitle')}</p>
+      </div>
+      <div class="scenario-grid">
+        {[
+          { icon: '🚀', title: 'features.scenario1_title', text: 'features.scenario1_text' },
+          { icon: '🏢', title: 'features.scenario2_title', text: 'features.scenario2_text' },
+          { icon: '🇪🇺', title: 'features.scenario3_title', text: 'features.scenario3_text' },
+          { icon: '🏫', title: 'features.scenario4_title', text: 'features.scenario4_text' },
+          { icon: '🔒', title: 'features.scenario5_title', text: 'features.scenario5_text' },
+          { icon: '🧪', title: 'features.scenario6_title', text: 'features.scenario6_text' },
+        ].map(s => (
+          <div class="scenario-card fade-in">
+            <div class="icon">{s.icon}</div>
+            <h3>{t(locale, s.title)}</h3>
+            <p>{t(locale, s.text)}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 5: ADAPTERS -->
+  <section id="adapters">
+    <div class="container">
+      <div class="feature-block fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.adapters_tag')}</div>
+          <h3>{t(locale, 'features.adapters_title')}</h3>
+          <p>{t(locale, 'features.adapters_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.adapters_check1')}</li>
+            <li>{t(locale, 'features.adapters_check2')}</li>
+            <li>{t(locale, 'features.adapters_check3')}</li>
+            <li>{t(locale, 'features.adapters_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--gray); margin-bottom:0.75rem;">{t(locale, 'features.adapters_visual_label')}</div>
+          <div style="text-align:left; line-height:2;">
+            <div>1. Admin creates group <span style="color:var(--teal); font-weight:600;">"engineering"</span> in Authentik</div>
+            <div style="color:var(--gray);">↓ webhook fires</div>
+            <div>2. Gitea → new org <span style="color:var(--teal);">"engineering"</span></div>
+            <div>3. Mattermost → new channel <span style="color:var(--teal);">"engineering"</span></div>
+            <div>4. Outline → new group <span style="color:var(--teal);">"engineering"</span></div>
+            <div>5. Stalwart → mailing list <span style="color:var(--teal);">engineering@company.com</span></div>
+            <div style="margin-top:0.5rem; color:var(--teal);">{t(locale, 'features.adapters_visual_done')}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 6: MAIL -->
+  <section class="alt-bg" id="mail">
+    <div class="container">
+      <div class="feature-block reverse fade-in">
+        <div class="feature-text">
+          <div class="tag">{t(locale, 'features.mail_tag')}</div>
+          <h3>{t(locale, 'features.mail_title')}</h3>
+          <p>{t(locale, 'features.mail_text')}</p>
+          <ul class="check-list">
+            <li>{t(locale, 'features.mail_check1')}</li>
+            <li>{t(locale, 'features.mail_check2')}</li>
+            <li>{t(locale, 'features.mail_check3')}</li>
+            <li>{t(locale, 'features.mail_check4')}</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="color:var(--gray); margin-bottom:0.75rem;">{t(locale, 'features.mail_visual_label')}</div>
+          <div style="text-align:left; line-height:2;">
+            <div><span style="color:var(--teal);">alice@company.com</span> logs in via SSO</div>
+            <div style="color:var(--gray);">↓ webhook fires</div>
+            <div>📬 Mailbox created</div>
+            <div>📅 Calendar ready</div>
+            <div>👥 Added to <span style="color:var(--teal);">engineering@company.com</span> list</div>
+            <div style="margin-top:0.5rem; color:var(--gray);">{t(locale, 'features.mail_visual_config')}</div>
+            <div>IMAP: <span style="color:var(--teal);">mail.company.com:993</span></div>
+            <div>SMTP: <span style="color:var(--teal);">mail.company.com:465</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <h2>{t(locale, 'features.cta_title')}</h2>
+    <p>{t(locale, 'features.cta_text')}</p>
+    <div class="btn-group">
+      <a href={localizedPath(locale, '/docs/quickstart')} class="btn btn-primary">{t(locale, 'features.cta_quickstart')}</a>
+      <a href="https://github.com/klyvra-org/klyvra" class="btn btn-outline">{t(locale, 'features.cta_github')}</a>
+    </div>
+  </section>
+
+</BaseLayout>

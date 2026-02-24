@@ -1,0 +1,163 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t, localizedPath } from '../i18n/index';
+import { defaultLocale } from '../i18n/locales';
+import '../styles/index.css';
+
+const locale = defaultLocale;
+---
+
+<BaseLayout title={t(locale, 'index.meta_title')} locale={locale} currentPath="/" activePage="home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <img src="/assets/logo.png" alt="Klyvra Logo">
+      <div class="badge">{t(locale, 'index.hero_badge')}</div>
+      <h1><Fragment set:html={t(locale, 'index.hero_title')} /></h1>
+      <p>{t(locale, 'index.hero_subtitle')}</p>
+      <div class="hero-buttons">
+        <a href="https://github.com/klyvra-org/klyvra" class="btn btn-primary">{t(locale, 'index.hero_cta_deploy')}</a>
+        <a href="#solution" class="btn btn-outline">{t(locale, 'index.hero_cta_learn')}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <div class="section-title">
+        <h2>{t(locale, 'index.problem_title')}</h2>
+        <p>{t(locale, 'index.problem_subtitle')}</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card fade-in">
+          <div class="icon">🔒</div>
+          <h3>{t(locale, 'index.problem1_title')}</h3>
+          <p>{t(locale, 'index.problem1_text')}</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="icon">⛓️</div>
+          <h3>{t(locale, 'index.problem2_title')}</h3>
+          <p>{t(locale, 'index.problem2_text')}</p>
+        </div>
+        <div class="problem-card fade-in">
+          <div class="icon">💸</div>
+          <h3>{t(locale, 'index.problem3_title')}</h3>
+          <p>{t(locale, 'index.problem3_text')}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="solution" id="solution">
+    <div class="container">
+      <div class="section-title">
+        <h2>{t(locale, 'index.solution_title')}</h2>
+        <p>{t(locale, 'index.solution_subtitle')}</p>
+      </div>
+      <div class="solution-content fade-in">
+        <div class="solution-text">
+          <h3>{t(locale, 'index.solution_heading')}</h3>
+          <p><Fragment set:html={t(locale, 'index.solution_text')} /></p>
+          <ul class="solution-features">
+            <li>{t(locale, 'index.solution_feat1')}</li>
+            <li><Fragment set:html={t(locale, 'index.solution_feat2')} /></li>
+            <li>{t(locale, 'index.solution_feat3')}</li>
+            <li>{t(locale, 'index.solution_feat4')}</li>
+            <li>{t(locale, 'index.solution_feat5')}</li>
+            <li>{t(locale, 'index.solution_feat6')}</li>
+          </ul>
+        </div>
+        <div class="arch-diagram">
+          <div style="margin-bottom:1rem; font-weight:700; font-size:1rem; color:var(--teal);">{t(locale, 'index.arch_title')}</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem; font-size:0.8rem;">
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📝 Outline<br><small>Wiki/Docs</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">💬 Mattermost<br><small>Chat</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🗂 Gitea<br><small>Code</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">☁️ Seafile<br><small>Files</small></div>
+            <div style="padding:0.6rem; background:rgba(43,92,230,0.15); border-radius:8px; grid-column:2; font-weight:700; color:var(--blue);">🔐 Authentik<br><small>SSO Hub</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">⏱ Kimai<br><small>Time</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">✅ Vikunja<br><small>Tasks</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📄 OnlyOffice<br><small>Office</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🔑 Vaultwarden<br><small>Passwords</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">📧 Stalwart<br><small>Mail/Cal</small></div>
+            <div style="padding:0.6rem; background:rgba(62,205,165,0.1); border-radius:8px;">🪣 MinIO<br><small>Storage</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPS -->
+  <section id="apps">
+    <div class="container">
+      <div class="section-title">
+        <h2>{t(locale, 'index.apps_title')}</h2>
+        <p>{t(locale, 'index.apps_subtitle')}</p>
+      </div>
+      <div class="apps-grid">
+        {[
+          { icon: '📝', name: 'Outline', replaces: 'index.app_outline_replaces', desc: 'index.app_outline_desc' },
+          { icon: '💬', name: 'Mattermost', replaces: 'index.app_mattermost_replaces', desc: 'index.app_mattermost_desc' },
+          { icon: '🗂', name: 'Gitea', replaces: 'index.app_gitea_replaces', desc: 'index.app_gitea_desc' },
+          { icon: '☁️', name: 'Seafile', replaces: 'index.app_seafile_replaces', desc: 'index.app_seafile_desc' },
+          { icon: '⏱', name: 'Kimai', replaces: 'index.app_kimai_replaces', desc: 'index.app_kimai_desc' },
+          { icon: '✅', name: 'Vikunja', replaces: 'index.app_vikunja_replaces', desc: 'index.app_vikunja_desc' },
+          { icon: '📄', name: 'OnlyOffice', replaces: 'index.app_onlyoffice_replaces', desc: 'index.app_onlyoffice_desc' },
+          { icon: '🪣', name: 'MinIO', replaces: 'index.app_minio_replaces', desc: 'index.app_minio_desc' },
+          { icon: '🔐', name: 'Authentik', replaces: 'index.app_authentik_replaces', desc: 'index.app_authentik_desc' },
+          { icon: '🔑', name: 'Vaultwarden', replaces: 'index.app_vaultwarden_replaces', desc: 'index.app_vaultwarden_desc' },
+          { icon: '📧', name: 'Stalwart', replaces: 'index.app_stalwart_replaces', desc: 'index.app_stalwart_desc' },
+        ].map(app => (
+          <div class="app-card fade-in">
+            <div class="app-icon">{app.icon}</div>
+            <h3>{app.name}</h3>
+            <div class="replaces">{t(locale, app.replaces)}</div>
+            <p>{t(locale, app.desc)}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-title">
+        <h2>{t(locale, 'index.pricing_title')}</h2>
+        <p>{t(locale, 'index.pricing_subtitle')}</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="tier">{t(locale, 'index.pricing_community')}</div>
+          <h3>{t(locale, 'index.pricing_self_hosted')}</h3>
+          <div class="price"><Fragment set:html={t(locale, 'index.pricing_free')} /></div>
+          <ul>
+            <li>{t(locale, 'index.pricing_feat1')}</li>
+            <li>{t(locale, 'index.pricing_feat2')}</li>
+            <li>{t(locale, 'index.pricing_feat3')}</li>
+            <li>{t(locale, 'index.pricing_feat4')}</li>
+            <li>{t(locale, 'index.pricing_feat5')}</li>
+          </ul>
+          <a href="https://github.com/klyvra-org/klyvra" class="btn btn-outline">{t(locale, 'index.pricing_github')}</a>
+        </div>
+        <div class="price-card featured">
+          <div class="tier">{t(locale, 'index.pricing_managed')}</div>
+          <h3>{t(locale, 'index.pricing_cloud')}</h3>
+          <div class="price"><Fragment set:html={t(locale, 'index.pricing_custom')} /></div>
+          <ul>
+            <li>{t(locale, 'index.pricing_managed_feat1')}</li>
+            <li>{t(locale, 'index.pricing_managed_feat2')}</li>
+            <li>{t(locale, 'index.pricing_managed_feat3')}</li>
+            <li>{t(locale, 'index.pricing_managed_feat4')}</li>
+            <li>{t(locale, 'index.pricing_managed_feat5')}</li>
+          </ul>
+          <a href="#" class="btn btn-primary" style="opacity:0.7; pointer-events:none; cursor:default;">{t(locale, 'index.pricing_coming_soon')}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>

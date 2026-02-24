@@ -1,0 +1,26 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Comandos do Makefile</h1>
+<p class="subtitle">Todos os comandos disponíveis para gerir a sua implementação Klyvra.</p>
+
+<table>
+  <tr><th>Comando</th><th>Descrição</th></tr>
+  <tr><td><code>make bootstrap</code></td><td>Gerar <code>.env</code> com segredos aleatórios</td></tr>
+  <tr><td><code>make bootstrap DOMAIN=x HTTP_PORT=y</code></td><td>Domínio e porta personalizados</td></tr>
+  <tr><td><code>make up</code></td><td>Compilar imagens, iniciar todos os serviços, aguardar pela saúde</td></tr>
+  <tr><td><code>make down</code></td><td>Parar todos os serviços (dados preservados em volumes)</td></tr>
+  <tr><td><code>make destroy</code></td><td>Parar e eliminar todos os dados (volumes removidos)</td></tr>
+  <tr><td><code>make start</code> / <code>make stop</code></td><td>Iniciar/parar sem recompilar</td></tr>
+  <tr><td><code>make healthcheck</code></td><td>Verificação HTTP rápida em todas as rotas</td></tr>
+  <tr><td><code>make test</code></td><td>Executar 95 testes unitários dos adapters</td></tr>
+  <tr><td><code>make verify</code></td><td>Executar suite de verificação completa (74 verificações)</td></tr>
+  <tr><td><code>make logs [SVC=x]</code></td><td>Seguir logs de containers (todos ou específico)</td></tr>
+  <tr><td><code>make restart [SVC=x]</code></td><td>Reiniciar serviços (todos ou específico)</td></tr>
+  <tr><td><code>make status</code></td><td>Painel de estado dos containers</td></tr>
+  <tr><td><code>make images</code></td><td>Compilar as 10 imagens Docker personalizadas</td></tr>
+  <tr><td><code>make push-images</code></td><td>Compilar e publicar imagens no registo</td></tr>
+</table>

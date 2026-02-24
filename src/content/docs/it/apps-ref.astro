@@ -1,0 +1,32 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Riferimento App</h1>
+<p class="subtitle">Tutte le 10 app in sintesi — cosa fanno, come si autenticano e cosa sostituiscono.</p>
+
+<table>
+  <tr><th>App</th><th>Sottodominio</th><th>Auth</th><th>Sostituisce</th><th>Sincronizzazione Gruppi</th></tr>
+  <tr><td>Authentik</td><td>auth.*</td><td>Hub</td><td>Okta, Azure AD</td><td>—</td></tr>
+  <tr><td>Outline</td><td>docs.*</td><td>OIDC</td><td>Notion, Confluence</td><td>✓ Adapter</td></tr>
+  <tr><td>Mattermost</td><td>chat.*</td><td>OAuth2</td><td>Slack, Teams</td><td>✓ Adapter</td></tr>
+  <tr><td>Gitea</td><td>git.*</td><td>OIDC</td><td>GitHub, GitLab</td><td>✓ Adapter</td></tr>
+  <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>Solo SSO</td></tr>
+  <tr><td>Kimai</td><td>time.*</td><td>SAML</td><td>Toggl, Harvest</td><td>Gruppi SAML</td></tr>
+  <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>Solo SSO</td></tr>
+  <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>Solo SSO</td></tr>
+  <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>Nessun account</td></tr>
+  <tr><td>Stalwart</td><td>mail.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+  <tr><td>MinIO</td><td>minio.*</td><td>Interno</td><td>AWS S3</td><td>Nessun account</td></tr>
+</table>
+
+<h2>Note</h2>
+<ul>
+  <li>OnlyOffice non ha account utente — è integrato in Outline per l'editing di documenti (Word/Excel/PowerPoint). Autenticato tramite segreto JWT condiviso.</li>
+  <li>MinIO è il backend S3 per lo storage dei file di Outline. Non è un'app rivolta agli utenti. Utilizza credenziali admin statiche.</li>
+  <li>Vaultwarden utilizza il fork <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> — l'immagine ufficiale non supporta SSO.</li>
+  <li>Mattermost utilizza Enterprise Edition (livello gratuito, nessuna licenza necessaria) perché la Team Edition ha rimosso OAuth nella v9.x.</li>
+  <li>Kimai mappa i claim dei gruppi SAML ai ruoli: <code>kimai-admin</code> → SUPER_ADMIN, <code>kimai-teamlead</code> → TEAMLEAD.</li>
+</ul>

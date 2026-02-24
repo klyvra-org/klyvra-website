@@ -1,0 +1,81 @@
+---
+import type { Locale } from '../../../i18n/locales';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+---
+
+<h1>Deployment mit Helm</h1>
+<p class="subtitle">Klyvra auf Kubernetes mit dem Helm Chart bereitstellen.</p>
+
+<h2>Voraussetzungen</h2>
+<ul>
+  <li>Kubernetes-Cluster (1.25+)</li>
+  <li>Helm 3</li>
+  <li>Ein Ingress-Controller (nginx-ingress, Traefik, etc.)</li>
+  <li>cert-manager (für automatisches TLS) — optional, aber empfohlen</li>
+</ul>
+
+<h2>Images bauen & pushen</h2>
+<p>Klyvra verwendet 10 benutzerdefinierte Images (adapters, init-Jobs, benutzerdefinierte Stalwart-/Seafile-Images). Bauen und pushen Sie diese in Ihre Registry:</p>
+<pre><code># Build locally
+make images
+
+# Push to your registry
+REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
+
+<h2>Installation</h2>
+<pre><code>helm install klyvra ./chart/klyvra \
+  --set global.domain=company.com \
+  --set global.imageRegistry=ghcr.io/your-org \
+  --set global.imageTag=v0.1.0</code></pre>
+
+<h2>RBAC in values.yaml konfigurieren</h2>
+<p>Die <code>values.yaml</code> des Charts hat einen dedizierten RBAC-Abschnitt. Definieren Sie Ihre Gruppen und deren app-spezifische Rollen:</p>
+<pre><code>rbac:
+  groups:
+    engineering:
+      displayName: "Engineering"
+      roles:
+        gitea: owner
+        outline: member
+        mattermost: member
+        kimai: user
+        stalwart: member
+
+    management:
+      displayName: "Management"
+      roles:
+        gitea: read
+        outline: admin
+        mattermost: admin
+        kimai: teamlead
+
+    hr:
+      displayName: "Human Resources"
+      roles:
+        gitea: null            # Excluded from code repos
+        outline: admin
+        kimai: teamlead</code></pre>
+
+<p>Das Chart konvertiert dies automatisch in pro-adapter ConfigMaps — kein manuelles JSON-Formatieren nötig.</p>
+
+<h2>Apps aktivieren/deaktivieren</h2>
+<pre><code># values.yaml
+outline:
+  enabled: true
+
+kimai:
+  enabled: false     # Don't need time tracking? Disable it.</code></pre>
+
+<h2>Ingress</h2>
+<p>Das Chart erstellt Ingress-Ressourcen für alle 11 Subdomains. Konfigurieren Sie Ihre Ingress-Klasse:</p>
+<pre><code>global:
+  ingress:
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod</code></pre>
+
+<div class="callout callout-info">
+  <strong>ℹ️ Erster Start</strong>
+  Nach <code>helm install</code> gilt derselbe First-Login-Prozess: Besuchen Sie die Authentik-URL, um das Admin-Konto zu erstellen, und beginnen Sie dann mit der Erstellung von Benutzern und Gruppen.
+</div>
