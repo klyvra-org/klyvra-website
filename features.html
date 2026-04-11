@@ -329,7 +329,7 @@
             <div>&nbsp;&nbsp;kimai: <span style="color:#7ec8e3;">user</span> <span style="opacity:0.4;">&nbsp;# track own time</span></div>
             <div style="margin-top:0.5rem;"><span style="color:var(--teal);">hr:</span></div>
             <div>&nbsp;&nbsp;gitea: <span style="color:#e74c3c;">null</span> <span style="opacity:0.4;">&nbsp;# no code access</span></div>
-            <div>&nbsp;&nbsp;outline: <span style="color:#7ec8e3;">admin</span> <span style="opacity:0.4;">&nbsp;# wiki admin</span></div>
+            <div>&nbsp;&nbsp;outline: <span style="color:#7ec8e3;">member</span> <span style="opacity:0.4;">&nbsp;# wiki read/write</span></div>
             <div>&nbsp;&nbsp;kimai: <span style="color:#7ec8e3;">teamlead</span> <span style="opacity:0.4;">&nbsp;# approve timesheets</span></div>
           </div>
         </div>
@@ -346,9 +346,9 @@
           <h3>Deploy a Whole Company in One Command.</h3>
           <p>No clicking through admin panels. No setup wizards. Klyvra uses blueprints, init containers, and adapters to wire everything together before anyone logs in. The only manual step? Creating your first admin account.</p>
           <ul class="check-list">
-            <li>15 Authentik blueprints auto-configure all SSO providers</li>
+            <li>18 Authentik blueprints auto-configure all SSO providers</li>
             <li>Init containers seed API keys, register auth sources, patch configs</li>
-            <li>4 webhook adapters keep app permissions in sync in real time</li>
+            <li>5 webhook adapters keep app permissions in sync in real time</li>
             <li>Fully idempotent — safe to restart, re-deploy, upgrade</li>
           </ul>
         </div>
@@ -360,7 +360,7 @@
             <div>cd klyvra</div>
             <div>make bootstrap DOMAIN=company.com</div>
             <div>make up</div>
-            <div style="margin-top:0.5rem; color:var(--teal);">✓ 33 containers running</div>
+             <div style="margin-top:0.5rem; color:var(--teal);">✓ 35 containers running</div>
             <div style="color:var(--teal);">✓ SSO configured for 10 apps</div>
             <div style="color:var(--teal);">✓ Webhooks armed, adapters listening</div>
             <div style="color:var(--teal);">✓ Ready at https://auth.company.com</div>
@@ -453,7 +453,7 @@
         <div class="feature-text">
           <div class="tag">Webhook Adapters</div>
           <h3>Apps That Talk to Each Other.</h3>
-          <p>When you create a group in Authentik, four lightweight adapters instantly create the matching resources: a Gitea org, a Mattermost channel, an Outline group, and a Stalwart mailing list. Add a user to the group and they're added everywhere. Remove the group and everything's cleaned up.</p>
+          <p>When you create a group in Authentik, five lightweight adapters instantly create the matching resources: a Gitea org, a Mattermost channel, an Outline group, a Seafile group, and a Stalwart mailing list. Add a user to the group and they're added everywhere. Remove the group and everything's cleaned up.</p>
           <ul class="check-list">
             <li>Real-time sync — changes propagate in milliseconds</li>
             <li>Stalwart auto-provisions mailboxes on first SSO login</li>
@@ -469,7 +469,8 @@
             <div>2. Gitea → new org <span style="color:var(--teal);">"engineering"</span></div>
             <div>3. Mattermost → new channel <span style="color:var(--teal);">"engineering"</span></div>
             <div>4. Outline → new group <span style="color:var(--teal);">"engineering"</span></div>
-            <div>5. Stalwart → mailing list <span style="color:var(--teal);">engineering@company.com</span></div>
+            <div>5. Seafile → new group <span style="color:var(--teal);">"engineering"</span></div>
+            <div>6. Stalwart → mailing list <span style="color:var(--teal);">engineering@company.com</span></div>
             <div style="margin-top:0.5rem; color:var(--teal);">Done. Under 1 second.</div>
           </div>
         </div>
@@ -501,8 +502,8 @@
             <div>📅 Calendar ready</div>
             <div>👥 Added to <span style="color:var(--teal);">engineering@company.com</span> list</div>
             <div style="margin-top:0.5rem; color:var(--gray);">Configure your mail client:</div>
-            <div>IMAP: <span style="color:var(--teal);">mail.company.com:993</span></div>
-            <div>SMTP: <span style="color:var(--teal);">mail.company.com:465</span></div>
+            <div>IMAP: <span style="color:var(--teal);">groupware.company.com:993</span></div>
+            <div>SMTP: <span style="color:var(--teal);">groupware.company.com:465</span></div>
           </div>
         </div>
       </div>

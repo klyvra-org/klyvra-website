@@ -254,6 +254,7 @@
 
       <h3>Tutorials</h3>
       <a href="#" onclick="showPage('add-users')" data-page="add-users">Adding Users & Groups</a>
+      <a href="#" onclick="showPage('presets')" data-page="presets">Industry Presets</a>
       <a href="#" onclick="showPage('custom-domain')" data-page="custom-domain">Custom Domain & TLS</a>
       <a href="#" onclick="showPage('helm')" data-page="helm">Deploying with Helm</a>
 
@@ -309,6 +310,12 @@
             <p>Move from localhost to a real domain with automatic HTTPS via Let's Encrypt.</p>
             <span class="tag tag-intermediate">Intermediate</span>
           </a>
+          <a class="guide-card" onclick="showPage('presets')">
+            <div class="icon">🏭</div>
+            <h3>Industry Presets</h3>
+            <p>Pre-built RBAC configs for software houses, agencies, law firms, and more.</p>
+            <span class="tag tag-beginner">Beginner</span>
+          </a>
           <a class="guide-card" onclick="showPage('architecture')">
             <div class="icon">🏗️</div>
             <h3>Architecture</h3>
@@ -352,7 +359,7 @@
 
         <h3><span class="step-number">3</span> Start everything</h3>
         <pre><code>make up</code></pre>
-        <p>This builds custom images, starts 33 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
+        <p>This builds custom images, starts 35 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
 
         <h2>What You Get</h2>
         <p>When <code>make up</code> finishes, these URLs are live:</p>
@@ -367,7 +374,7 @@
           <tr><td>Kimai</td><td><a href="http://time.localhost">time.localhost</a></td><td>Time tracking</td></tr>
           <tr><td>Vikunja</td><td><a href="http://tasks.localhost">tasks.localhost</a></td><td>Task management</td></tr>
           <tr><td>Vaultwarden</td><td><a href="http://vault.localhost">vault.localhost</a></td><td>Password manager</td></tr>
-          <tr><td>Stalwart</td><td><a href="http://mail.localhost">mail.localhost</a></td><td>Email, calendar, contacts</td></tr>
+          <tr><td>Stalwart</td><td><a href="http://groupware.localhost">groupware.localhost</a></td><td>Email, calendar, contacts</td></tr>
           <tr><td>OnlyOffice</td><td><a href="http://office.localhost">office.localhost</a></td><td>Document editing</td></tr>
         </table>
 
@@ -403,12 +410,12 @@
         <h2><span class="step-number">3</span> Log Into an App</h2>
         <p>Go to any app URL, for example <a href="http://docs.localhost">docs.localhost</a> (Outline). You'll see a login page with an SSO button:</p>
         <ul>
-          <li>Outline → "Continue with OIDC"</li>
-          <li>Mattermost → "GitLab" (it's actually Authentik — Mattermost calls all OAuth2 "GitLab")</li>
-          <li>Gitea → "Sign in with Authentik"</li>
+          <li>Outline → "Continue with Klyvra"</li>
+          <li>Mattermost → "Login with Klyvra"</li>
+          <li>Gitea → "Sign in with Klyvra"</li>
           <li>Seafile → "Single Sign-On"</li>
-          <li>Kimai → "Login with Authentik"</li>
-          <li>Vikunja → "Authentik"</li>
+          <li>Kimai → "Login with Klyvra"</li>
+          <li>Vikunja → "Klyvra"</li>
           <li>Vaultwarden → "Enterprise Single Sign-On" (enter any email → SSO redirects to Authentik)</li>
         </ul>
         <p>Click the SSO button → you're redirected to Authentik → log in → redirected back to the app, logged in. That's the flow for all apps.</p>
@@ -418,11 +425,16 @@
           You don't need to create accounts in each app. The first time you log in via SSO, a local account is automatically created in that app with your Authentik email and display name.
         </div>
 
+        <div class="callout callout-warn">
+          <strong>⚠️ Outline first-login gotcha</strong>
+          The very first user to log into Outline automatically becomes the workspace admin. Make sure the person who sets up the stack logs into Outline first — not a regular user. If the wrong person logs in first, you'll need to manually adjust admin status via the Outline API.
+        </div>
+
         <h2><span class="step-number">4</span> Stalwart Mail</h2>
-        <p>Stalwart is slightly different — mailboxes are created automatically on first SSO login (JIT provisioning). After logging in at <a href="http://mail.localhost">mail.localhost</a>, your mailbox is ready for IMAP/SMTP at:</p>
+        <p>Stalwart is slightly different — mailboxes are created automatically on first SSO login (JIT provisioning). After logging in at <a href="http://groupware.localhost">groupware.localhost</a>, your mailbox is ready for IMAP/SMTP at:</p>
         <ul>
-          <li>IMAP: <code>mail.localhost:143</code></li>
-          <li>SMTP: <code>mail.localhost:587</code></li>
+          <li>IMAP: <code>groupware.localhost:143</code></li>
+          <li>SMTP: <code>groupware.localhost:587</code></li>
           <li>Username: your Authentik email</li>
         </ul>
 
@@ -443,12 +455,13 @@
         <p>Klyvra uses a hub-and-spoke model for access control:</p>
         <ol>
           <li>You create a group in Authentik (e.g., "engineering")</li>
-          <li>Authentik fires a webhook to all 4 adapters</li>
+          <li>Authentik fires a webhook to all 5 adapters</li>
           <li>Each adapter creates the matching resource in its app:
             <ul>
               <li>Gitea → creates an organization</li>
               <li>Mattermost → creates a channel</li>
               <li>Outline → creates a group (for collection permissions)</li>
+              <li>Seafile → creates a group (for library sharing)</li>
               <li>Stalwart → creates a mailing list</li>
             </ul>
           </li>
@@ -473,7 +486,8 @@ ROLE_MAPPING='{"engineering": "owner", "management": "read", "hr": null}'</code>
           <tr><th>App</th><th>Roles</th><th>Default</th></tr>
           <tr><td>Gitea</td><td><code>owner</code> · <code>admin</code> · <code>write</code> · <code>read</code></td><td><code>owner</code></td></tr>
           <tr><td>Mattermost</td><td><code>admin</code> · <code>member</code></td><td><code>member</code></td></tr>
-          <tr><td>Outline</td><td><code>admin</code> · <code>member</code> · <code>viewer</code></td><td><code>member</code></td></tr>
+          <tr><td>Outline</td><td><code>member</code></td><td><code>member</code></td></tr>
+          <tr><td>Seafile</td><td><code>member</code></td><td><code>member</code></td></tr>
           <tr><td>Kimai</td><td><code>super_admin</code> · <code>teamlead</code> · <code>user</code></td><td>Mapped via SAML groups</td></tr>
           <tr><td>Stalwart</td><td><code>member</code></td><td><code>member</code> (mailing list)</td></tr>
         </table>
@@ -496,6 +510,7 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
         gitea: owner          # Full repo access
         outline: member        # Wiki read/write
         mattermost: member     # Channel member
+        seafile: member        # File access
         kimai: user            # Track own time
         stalwart: member       # Mailing list
 
@@ -503,15 +518,17 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
       displayName: "Management"
       roles:
         gitea: read            # View-only repos
-        outline: admin         # Wiki admin
+        outline: member        # Wiki read/write
         mattermost: admin      # Channel admin
+        seafile: member        # File access
         kimai: teamlead        # Approve timesheets
 
     hr:
       displayName: "Human Resources"
       roles:
         gitea: null            # No code access
-        outline: admin         # Wiki admin
+        outline: member        # Wiki read/write
+        seafile: member        # File access
         kimai: teamlead        # Approve timesheets
         stalwart: member       # Mailing list</code></pre>
 
@@ -544,7 +561,7 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
                  ├── time.*      → Kimai        (SAML)
                  ├── tasks.*     → Vikunja      (OIDC)
                  ├── vault.*     → Vaultwarden  (OIDC)
-                 ├── mail.*      → Stalwart     (OIDC)
+                  ├── groupware.*  → Stalwart     (OIDC)
                  ├── office.*    → OnlyOffice   (JWT)
                  └── minio.*     → MinIO        (internal)</code></pre>
 
@@ -560,15 +577,16 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
 
         <h2>Blueprints (Zero-Touch Config)</h2>
         <p>Authentik blueprints are YAML files that declaratively create all SSO providers, webhook transports, and scope mappings. They're mounted into the Authentik worker and auto-applied on startup — no UI clicks needed.</p>
-        <p>There are 15 blueprints in <code>apps/authentik/blueprints/</code>: one per OIDC/SAML provider, one per webhook transport, plus shared scope and comms launcher configs.</p>
+        <p>There are 18 blueprints in <code>apps/authentik/blueprints/</code>: one per OIDC/SAML provider, one per webhook transport, plus shared scope and comms launcher configs.</p>
 
         <h2>Adapters</h2>
-        <p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 4 adapters:</p>
+        <p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 5 adapters:</p>
         <table>
           <tr><th>Adapter</th><th>Receives</th><th>Creates</th></tr>
           <tr><td>outline-adapter</td><td>Group CRUD, user login</td><td>Outline groups + membership</td></tr>
           <tr><td>mattermost-adapter</td><td>Group CRUD, user login</td><td>Channels + membership + slash commands</td></tr>
           <tr><td>gitea-adapter</td><td>Group CRUD, user login</td><td>Organizations + team membership</td></tr>
+          <tr><td>seafile-adapter</td><td>Group CRUD, user login</td><td>Groups + library sharing + membership</td></tr>
           <tr><td>stalwart-adapter</td><td>Group CRUD, user login</td><td>Mailing lists + JIT mailbox provisioning</td></tr>
         </table>
 
@@ -605,6 +623,7 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
     ├──webhook──→ outline-adapter ──API──→ Outline
     ├──webhook──→ mattermost-adapter ──API──→ Mattermost
     ├──webhook──→ gitea-adapter ──API──→ Gitea
+    ├──webhook──→ seafile-adapter ──API──→ Seafile
     └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
 
         <h2>Webhook Events</h2>
@@ -656,11 +675,12 @@ GET  /pending    — Lists queued pending operations</code></pre>
           <li>Enter the group name (e.g., <code>engineering</code>)</li>
           <li>Click <strong>Create</strong></li>
         </ol>
-        <p>Within seconds, all 4 adapters receive a webhook and create the corresponding resources:</p>
+        <p>Within seconds, all 5 adapters receive a webhook and create the corresponding resources:</p>
         <ul>
           <li>Gitea: organization <code>engineering</code></li>
           <li>Mattermost: channel <code>engineering</code></li>
           <li>Outline: group <code>engineering</code></li>
+          <li>Seafile: group <code>engineering</code></li>
           <li>Stalwart: mailing list <code>engineering@yourdomain.com</code></li>
         </ul>
 
@@ -697,6 +717,46 @@ GET  /pending    — Lists queued pending operations</code></pre>
       </div>
 
       <!-- CUSTOM DOMAIN -->
+
+      <!-- INDUSTRY PRESETS -->
+      <div id="page-presets" class="doc-page">
+        <h1>Industry Presets</h1>
+        <p class="subtitle">Pre-built RBAC configurations for common company types. Zero to productive in seconds.</p>
+
+        <h2>What Are Presets?</h2>
+        <p>Klyvra ships with 5 industry presets that define groups, roles, and per-app permissions tailored to specific company types. Instead of configuring RBAC from scratch, pick a preset and apply it.</p>
+
+        <h2>Available Presets</h2>
+        <table>
+          <tr><th>Preset</th><th>Groups</th><th>Best For</th></tr>
+          <tr><td><code>software-house</code></td><td>engineering, management, design, qa, devops</td><td>Dev shops, agencies, SaaS companies</td></tr>
+          <tr><td><code>marketing-agency</code></td><td>creative, account-management, strategy, production</td><td>Agencies, media companies</td></tr>
+          <tr><td><code>law-firm</code></td><td>partners, associates, paralegals, admin-staff</td><td>Legal practices, consultancies</td></tr>
+          <tr><td><code>consultancy</code></td><td>consultants, analysts, operations, leadership</td><td>Management consulting, advisory</td></tr>
+          <tr><td><code>non-profit</code></td><td>program-staff, volunteers, admin, board</td><td>NGOs, foundations, charities</td></tr>
+        </table>
+
+        <h2>Applying a Preset (Docker Compose)</h2>
+        <pre><code># Generate ROLE_MAPPING env vars for your .env file
+python3 scripts/apply_preset.py presets/software-house.yaml --env-format >> .env
+
+# Restart adapters to pick up new role mappings
+make restart</code></pre>
+
+        <h2>Applying a Preset (Helm)</h2>
+        <pre><code># Generate Helm values override
+python3 scripts/apply_preset.py presets/software-house.yaml --helm-format > my-rbac.yaml
+
+# Install or upgrade with the preset
+helm install klyvra ./chart/klyvra -f my-rbac.yaml --set global.domain=company.com</code></pre>
+
+        <div class="callout callout-tip">
+          <strong>💡 Customise after applying</strong>
+          Presets are starting points, not straitjackets. After applying, edit the generated <code>ROLE_MAPPING</code> values or <code>values.yaml</code> to match your exact needs.
+        </div>
+      </div>
+
+      <!-- CUSTOM DOMAIN -->
       <div id="page-custom-domain" class="doc-page">
         <h1>Custom Domain & TLS</h1>
         <p class="subtitle">Move from localhost to a real domain with automatic HTTPS.</p>
@@ -710,7 +770,7 @@ make up                                 # Start everything</code></pre>
         <h2>DNS Setup</h2>
         <p>Point a wildcard DNS record to your server:</p>
         <pre><code>*.company.com    A    → your-server-ip</code></pre>
-        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>mail</code>, <code>office</code>, <code>minio</code>.</p>
+        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>groupware</code>, <code>office</code>, <code>minio</code>.</p>
 
         <h2>Enabling TLS (HTTPS)</h2>
         <p>Caddy supports automatic Let's Encrypt certificates. To enable:</p>
@@ -773,6 +833,7 @@ REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
         gitea: owner
         outline: member
         mattermost: member
+        seafile: member
         kimai: user
         stalwart: member
 
@@ -780,15 +841,17 @@ REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
       displayName: "Management"
       roles:
         gitea: read
-        outline: admin
+        outline: member
         mattermost: admin
+        seafile: member
         kimai: teamlead
 
     hr:
       displayName: "Human Resources"
       roles:
         gitea: null            # Excluded from code repos
-        outline: admin
+        outline: member
+        seafile: member
         kimai: teamlead</code></pre>
 
         <p>The chart converts this into per-adapter ConfigMaps automatically — no manual JSON wrangling.</p>
@@ -826,12 +889,12 @@ kimai:
           <tr><td>Outline</td><td>docs.*</td><td>OIDC</td><td>Notion, Confluence</td><td>✓ Adapter</td></tr>
           <tr><td>Mattermost</td><td>chat.*</td><td>OAuth2</td><td>Slack, Teams</td><td>✓ Adapter</td></tr>
           <tr><td>Gitea</td><td>git.*</td><td>OIDC</td><td>GitHub, GitLab</td><td>✓ Adapter</td></tr>
-          <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>SSO only</td></tr>
+          <tr><td>Seafile</td><td>files.*</td><td>OAuth2</td><td>Google Drive, OneDrive</td><td>✓ Adapter</td></tr>
           <tr><td>Kimai</td><td>time.*</td><td>SAML</td><td>Toggl, Harvest</td><td>SAML groups</td></tr>
           <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>SSO only</td></tr>
           <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>SSO only</td></tr>
           <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>No accounts</td></tr>
-          <tr><td>Stalwart</td><td>mail.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+          <tr><td>Stalwart</td><td>groupware.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
           <tr><td>MinIO</td><td>minio.*</td><td>Internal</td><td>AWS S3</td><td>No accounts</td></tr>
         </table>
 
@@ -842,6 +905,7 @@ kimai:
           <li>Vaultwarden uses the <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> fork — the official image doesn't support SSO.</li>
           <li>Mattermost uses Enterprise Edition (free tier, no license needed) because Team Edition removed OAuth in v9.x.</li>
           <li>Kimai maps SAML group claims to roles: <code>kimai-admin</code> → SUPER_ADMIN, <code>kimai-teamlead</code> → TEAMLEAD.</li>
+          <li>Kimai matches group names <strong>literally</strong> — the Authentik group must be named exactly <code>kimai-admin</code> or <code>kimai-teamlead</code> (not <code>engineering</code> or <code>management</code>). This is a Kimai limitation.</li>
         </ul>
       </div>
 
@@ -858,9 +922,9 @@ kimai:
           <tr><td><code>MATTERMOST_TEAM_NAME</code></td><td><code>main</code></td><td>Default Mattermost team name</td></tr>
           <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Create /comms, /mail, /calendar slash commands</td></tr>
           <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Send welcome DM with comms links on first login</td></tr>
-          <tr><td><code>MAIL_URL</code></td><td><code>http://mail.${DOMAIN}</code></td><td>Target URL for mail redirect</td></tr>
-          <tr><td><code>CALENDAR_URL</code></td><td><code>http://calendar.${DOMAIN}</code></td><td>Target URL for calendar redirect</td></tr>
-          <tr><td><code>CONTACTS_URL</code></td><td><code>http://contacts.${DOMAIN}</code></td><td>Target URL for contacts redirect</td></tr>
+          <tr><td><code>MAIL_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for mail redirect</td></tr>
+          <tr><td><code>CALENDAR_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for calendar redirect</td></tr>
+          <tr><td><code>CONTACTS_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for contacts redirect</td></tr>
         </table>
 
         <h2>Auto-Generated (don't touch)</h2>
@@ -900,7 +964,7 @@ make up             # clean start</code></pre>
         <pre><code># /etc/hosts
 127.0.0.1 auth.localhost docs.localhost chat.localhost git.localhost
 127.0.0.1 files.localhost time.localhost tasks.localhost vault.localhost
-127.0.0.1 mail.localhost office.localhost minio.localhost</code></pre>
+127.0.0.1 groupware.localhost office.localhost minio.localhost</code></pre>
 
         <h2>Service won't start</h2>
         <pre><code>docker compose logs &lt;service-name&gt;    # Check logs
@@ -915,7 +979,7 @@ make logs SVC=&lt;service-name&gt;           # Follow logs</code></pre>
         <p>Klyvra uses <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> (<code>timshel/oidcwarden:latest</code>), not the official Vaultwarden image. The official image silently ignores <code>SSO_*</code> env vars. OIDCWarden still requires a master password after SSO login (by design — it encrypts your vault).</p>
 
         <h2>Mattermost shows "GitLab" as SSO provider</h2>
-        <p>This is expected. Mattermost's free tier only supports "GitLab" as an OAuth2 provider type. Authentik is configured to match GitLab's userinfo format, so it works transparently. The button says "GitLab" but actually redirects to Authentik.</p>
+        <p>This is a legacy label. If your Mattermost still shows "GitLab" instead of "Login with Klyvra", check that you're using the latest Klyvra compose config. Mattermost's free tier only supports "GitLab" as an OAuth2 provider type — Klyvra patches the button text to say "Login with Klyvra" but the internal provider type remains "gitlab".</p>
 
         <h2>Init container keeps restarting</h2>
         <p>Init containers use <code>restart: on-failure</code> and retry until their target app is ready. Check if the target app is healthy:</p>
@@ -945,13 +1009,17 @@ docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>
           <tr><td><code>make destroy</code></td><td>Stop and delete all data (volumes removed)</td></tr>
           <tr><td><code>make start</code> / <code>make stop</code></td><td>Start/stop without rebuilding</td></tr>
           <tr><td><code>make healthcheck</code></td><td>Quick HTTP check on all routes</td></tr>
-          <tr><td><code>make test</code></td><td>Run 95 adapter unit tests</td></tr>
-          <tr><td><code>make verify</code></td><td>Run full verification suite (74 checks)</td></tr>
+          <tr><td><code>make test</code></td><td>Run 149 adapter unit tests</td></tr>
+          <tr><td><code>make verify</code></td><td>Run full verification suite (97 checks)</td></tr>
           <tr><td><code>make logs [SVC=x]</code></td><td>Follow container logs (all or specific)</td></tr>
           <tr><td><code>make restart [SVC=x]</code></td><td>Restart services (all or specific)</td></tr>
           <tr><td><code>make status</code></td><td>Container status dashboard</td></tr>
           <tr><td><code>make images</code></td><td>Build all 10 custom Docker images</td></tr>
           <tr><td><code>make push-images</code></td><td>Build and push images to registry</td></tr>
+          <tr><td><code>make upgrade</code></td><td>Pull latest images, rebuild, and restart</td></tr>
+          <tr><td><code>make backup</code></td><td>Back up all databases, volumes, and .env</td></tr>
+          <tr><td><code>make restore BACKUP=path</code></td><td>Restore from a backup directory</td></tr>
+          <tr><td><code>make smoke-test</code></td><td>E2E endpoint and OIDC validation (requires running stack)</td></tr>
         </table>
       </div>
 
