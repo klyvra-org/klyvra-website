@@ -256,10 +256,12 @@
       <a href="#" onclick="showPage('add-users')" data-page="add-users">Adding Users & Groups</a>
       <a href="#" onclick="showPage('presets')" data-page="presets">Industry Presets</a>
       <a href="#" onclick="showPage('custom-domain')" data-page="custom-domain">Custom Domain & TLS</a>
+      <a href="#" onclick="showPage('production')" data-page="production">Production Deployment</a>
       <a href="#" onclick="showPage('helm')" data-page="helm">Deploying with Helm</a>
 
       <h3>Reference</h3>
       <a href="#" onclick="showPage('apps-ref')" data-page="apps-ref">App Reference</a>
+      <a href="#" onclick="showPage('comms')" data-page="comms">Communications Front Door</a>
       <a href="#" onclick="showPage('env-ref')" data-page="env-ref">Environment Variables</a>
       <a href="#" onclick="showPage('troubleshooting')" data-page="troubleshooting">Troubleshooting</a>
       <a href="#" onclick="showPage('makefile-ref')" data-page="makefile-ref">Makefile Commands</a>
@@ -302,6 +304,12 @@
             <div class="icon">☸️</div>
             <h3>Deploying with Helm</h3>
             <p>Deploy on Kubernetes with the Klyvra Helm chart. Declarative RBAC in values.yaml.</p>
+            <span class="tag tag-intermediate">Intermediate</span>
+          </a>
+          <a class="guide-card" onclick="showPage('production')">
+            <div class="icon">🏭</div>
+            <h3>Production Deployment</h3>
+            <p>Hardware requirements, firewall, email DNS setup, backup/restore, and security hardening.</p>
             <span class="tag tag-intermediate">Intermediate</span>
           </a>
           <a class="guide-card" onclick="showPage('custom-domain')">
@@ -389,13 +397,18 @@
         <h1>Your First Login</h1>
         <p class="subtitle">Create an admin account, understand the SSO flow, and log into every app.</p>
 
-        <h2><span class="step-number">1</span> Create the Authentik Admin</h2>
-        <p>Open <a href="http://auth.localhost/if/flow/initial-setup/">http://auth.localhost/if/flow/initial-setup/</a> in your browser.</p>
-        <p>You'll see a one-time setup form. Create your admin account with a strong password. This is the only manual step in the entire setup.</p>
+        <h2><span class="step-number">1</span> Log In as Authentik Admin</h2>
+        <p>Open <a href="http://auth.localhost">http://auth.localhost</a> in your browser. Log in with:</p>
+        <ul>
+          <li><strong>Username:</strong> <code>akadmin</code></li>
+          <li><strong>Password:</strong> the value of <code>AUTHENTIK_BOOTSTRAP_PASSWORD</code> in your <code>.env</code> file</li>
+        </ul>
+        <p>To find the password:</p>
+        <pre><code>grep AUTHENTIK_BOOTSTRAP_PASSWORD .env</code></pre>
 
-        <div class="callout callout-warn">
-          <strong>⚠️ Save these credentials</strong>
-          This is the Authentik admin account. If you lose it, you'll need to reset via the database. Consider storing it in Vaultwarden once it's running!
+        <div class="callout callout-tip">
+          <strong>💡 Tip</strong>
+          Store this password in Vaultwarden once it's running. You can change it later in the Authentik admin panel under Directory → Users → akadmin.
         </div>
 
         <h2><span class="step-number">2</span> Explore the Admin Panel</h2>
@@ -572,7 +585,7 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
           <tr><td>Mattermost</td><td>OAuth2</td><td>Uses "GitLab" provider type (same protocol)</td></tr>
           <tr><td>Seafile</td><td>OAuth2</td><td>Custom OAuth via patched settings</td></tr>
           <tr><td>Kimai</td><td>SAML 2.0</td><td>Only external auth method Kimai supports</td></tr>
-          <tr><td>OnlyOffice</td><td>JWT</td><td>No user accounts — shared secret with Outline</td></tr>
+          <tr><td>OnlyOffice</td><td>JWT</td><td>No user accounts — shared secret with Seafile</td></tr>
         </table>
 
         <h2>Blueprints (Zero-Touch Config)</h2>
@@ -762,38 +775,42 @@ helm install klyvra ./chart/klyvra -f my-rbac.yaml --set global.domain=company.c
         <p class="subtitle">Move from localhost to a real domain with automatic HTTPS.</p>
 
         <h2>Setting a Custom Domain</h2>
-        <pre><code>make destroy                            # Clean slate
-make bootstrap DOMAIN=company.com       # Generate .env with your domain
-make up                                 # Start everything</code></pre>
-        <p>All services become <code>auth.company.com</code>, <code>docs.company.com</code>, <code>chat.company.com</code>, etc.</p>
+        <pre><code>make destroy                                        # Clean slate (if upgrading from localhost)
+make bootstrap DOMAIN=company.com TLS_EMAIL=admin@company.com
+make up</code></pre>
+        <p>All services become <code>https://auth.company.com</code>, <code>https://docs.company.com</code>, <code>https://chat.company.com</code>, etc.</p>
+
+        <div class="callout callout-tip">
+          <strong>💡 What happens automatically</strong>
+          When <code>make bootstrap</code> detects a non-localhost domain, it creates a <code>Caddyfile.prod</code> symlink with bare hostnames (auto-HTTPS). For local development, <code>make bootstrap</code> (no DOMAIN) creates a <code>Caddyfile.dev</code> symlink with HTTP-only routing. No manual Caddyfile editing is needed.
+        </div>
 
         <h2>DNS Setup</h2>
         <p>Point a wildcard DNS record to your server:</p>
         <pre><code>*.company.com    A    → your-server-ip</code></pre>
-        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>groupware</code>, <code>office</code>, <code>minio</code>.</p>
+        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>groupware</code>, <code>office</code>, <code>mail</code>, <code>calendar</code>, <code>contacts</code>.</p>
 
-        <h2>Enabling TLS (HTTPS)</h2>
-        <p>Caddy supports automatic Let's Encrypt certificates. To enable:</p>
-
-        <h3><span class="step-number">1</span> Edit the Caddyfile</h3>
-        <p>Open <code>apps/caddy/Caddyfile</code> and remove the <code>auto_https off</code> line. Change the protocol from <code>http://</code> to bare domain matching:</p>
-        <pre><code># Before:
-http://auth.{$DOMAIN}:{$HTTP_PORT} { ... }
-
-# After (Caddy auto-enables HTTPS):
-auth.{$DOMAIN} { ... }</code></pre>
-
-        <h3><span class="step-number">2</span> Update ports</h3>
-        <p>In <code>compose.yaml</code>, expose ports 80 and 443 on Caddy for HTTP→HTTPS redirect and TLS respectively.</p>
-
-        <h3><span class="step-number">3</span> Restart</h3>
-        <pre><code>make down && make up</code></pre>
-        <p>Caddy automatically obtains and renews Let's Encrypt certificates for all subdomains.</p>
+        <h2>TLS (HTTPS)</h2>
+        <p>TLS is fully automated when using a custom domain:</p>
+        <ol>
+          <li>Run <code>make bootstrap DOMAIN=company.com TLS_EMAIL=admin@company.com</code></li>
+          <li>Point DNS wildcard <code>*.company.com</code> to your server</li>
+          <li>Run <code>make up</code> — Caddy auto-provisions Let's Encrypt certificates for all subdomains</li>
+        </ol>
+        <p>Caddy handles certificate issuance, renewal, and HTTPS redirects automatically. No manual configuration needed.</p>
 
         <div class="callout callout-warn">
           <strong>⚠️ Firewall</strong>
-          Ports 80 and 443 must be reachable from the internet for Let's Encrypt HTTP-01 challenges. If behind a firewall, consider using DNS-01 challenges instead.
+          Ports 80 and 443 must be reachable from the internet for Let's Encrypt HTTP-01 challenges. If behind a firewall, consider using DNS-01 challenges instead (requires Caddy DNS plugin configuration).
         </div>
+
+        <h2>Switching Between Dev and Production</h2>
+        <p>The bootstrap command manages this automatically:</p>
+        <table>
+          <tr><th>Command</th><th>Mode</th><th>URLs</th></tr>
+          <tr><td><code>make bootstrap</code></td><td>Dev (<code>Caddyfile.dev</code>)</td><td><code>http://app.localhost</code></td></tr>
+          <tr><td><code>make bootstrap DOMAIN=x TLS_EMAIL=y</code></td><td>Prod (<code>Caddyfile.prod</code>)</td><td><code>https://app.company.com</code></td></tr>
+        </table>
       </div>
 
       <!-- HELM -->
@@ -900,7 +917,7 @@ kimai:
 
         <h2>Notes</h2>
         <ul>
-          <li>OnlyOffice has no user accounts — it's embedded in Outline for document editing (Word/Excel/PowerPoint). Authenticated via shared JWT secret.</li>
+          <li>OnlyOffice has no user accounts — it's a document server accessed via Seafile's integration for editing Word/Excel/PowerPoint files. Authenticated via shared JWT secret with Seafile.</li>
           <li>MinIO is the S3 backend for Outline's file storage. Not a user-facing app. Uses static admin credentials.</li>
           <li>Vaultwarden uses the <a href="https://github.com/Timshel/OIDCWarden">OIDCWarden</a> fork — the official image doesn't support SSO.</li>
           <li>Mattermost uses Enterprise Edition (free tier, no license needed) because Team Edition removed OAuth in v9.x.</li>
@@ -995,6 +1012,174 @@ make logs SVC=gitea-adapter
 docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>
       </div>
 
+      <!-- PRODUCTION GUIDE -->
+      <div id="page-production" class="doc-page">
+        <h1>Production Deployment</h1>
+        <p class="subtitle">Deploy Klyvra in production using Docker Compose or Kubernetes.</p>
+
+        <h2>Hardware Requirements</h2>
+        <table>
+          <tr><th></th><th>Minimum</th><th>Recommended</th></tr>
+          <tr><td>RAM</td><td>8 GB</td><td>16 GB</td></tr>
+          <tr><td>CPU</td><td>2 vCPUs</td><td>4 vCPUs</td></tr>
+          <tr><td>Storage</td><td>40 GB SSD</td><td>100 GB+ SSD</td></tr>
+        </table>
+
+        <h2>Software Requirements</h2>
+        <ul>
+          <li><strong>Docker Compose:</strong> Docker Engine 24.0+ with Compose v2</li>
+          <li><strong>Kubernetes:</strong> Version 1.25+ (if using Helm)</li>
+          <li><strong>DNS:</strong> A wildcard A record (<code>*.company.com</code>) pointing to your server</li>
+          <li><code>make</code> and <code>openssl</code> installed on the deployment machine</li>
+        </ul>
+
+        <h2>Docker Compose Deployment</h2>
+        <h3><span class="step-number">1</span> Bootstrap with production settings</h3>
+        <pre><code>make bootstrap DOMAIN=company.com TLS_EMAIL=admin@company.com</code></pre>
+        <p>This generates 35+ random secrets, sets the base domain for all subdomains, configures Caddy for automatic HTTPS via Let's Encrypt, and symlinks the production Caddyfile.</p>
+
+        <h3><span class="step-number">2</span> Start services</h3>
+        <pre><code>make up</code></pre>
+
+        <h3><span class="step-number">3</span> Configure firewall</h3>
+        <table>
+          <tr><th>Port</th><th>Protocol</th><th>Service</th></tr>
+          <tr><td>80</td><td>TCP</td><td>HTTP (Caddy redirect)</td></tr>
+          <tr><td>443</td><td>TCP</td><td>HTTPS (Caddy reverse proxy)</td></tr>
+          <tr><td>25</td><td>TCP</td><td>SMTP (Stalwart)</td></tr>
+          <tr><td>587</td><td>TCP</td><td>SMTP Submission (Stalwart)</td></tr>
+          <tr><td>143</td><td>TCP</td><td>IMAP (Stalwart)</td></tr>
+          <tr><td>2222</td><td>TCP</td><td>SSH (Gitea git clone)</td></tr>
+        </table>
+
+        <h2>Email DNS Configuration</h2>
+        <p>For production email deliverability, configure these DNS records (replace <code>company.com</code> with your domain):</p>
+
+        <h3>Required records</h3>
+        <table>
+          <tr><th>Type</th><th>Host</th><th>Value</th><th>Purpose</th></tr>
+          <tr><td>MX</td><td><code>company.com</code></td><td><code>10 mail.company.com</code></td><td>Route inbound email</td></tr>
+          <tr><td>A</td><td><code>mail.company.com</code></td><td><code>&lt;your-server-ip&gt;</code></td><td>Mail server hostname</td></tr>
+          <tr><td>TXT</td><td><code>company.com</code></td><td><code>v=spf1 mx ~all</code></td><td>SPF: authorize server to send mail</td></tr>
+        </table>
+
+        <h3>DKIM setup</h3>
+        <ol>
+          <li>Access Stalwart admin at <code>https://groupware.company.com/admin/</code> (use <code>STALWART_ADMIN_PASSWORD</code> from <code>.env</code>)</li>
+          <li>Navigate to Settings → DKIM — Stalwart auto-generates DKIM keys on domain creation</li>
+          <li>Copy the public key and create a DNS TXT record at <code>default._domainkey.company.com</code></li>
+        </ol>
+
+        <h3>DMARC</h3>
+        <pre><code>Type: TXT
+Host: _dmarc.company.com
+Value: v=DMARC1; p=quarantine; rua=mailto:admin@company.com; pct=100</code></pre>
+        <p>Start with <code>p=none</code> (monitor only) before switching to <code>p=quarantine</code> or <code>p=reject</code>.</p>
+
+        <h3>Reverse DNS (PTR)</h3>
+        <p>Contact your hosting provider to set the PTR record for your server's IP to <code>mail.company.com</code>. Many email providers reject mail from IPs without matching PTR records.</p>
+
+        <h3>Mail client autoconfiguration</h3>
+        <p>Klyvra serves autoconfig/autodiscover XML files automatically. Point these subdomains to your server:</p>
+        <ul>
+          <li><code>autoconfig.company.com</code> (Thunderbird)</li>
+          <li><code>autodiscover.company.com</code> (Outlook/iOS)</li>
+        </ul>
+
+        <h2>Backup & Restore</h2>
+        <pre><code># Back up all databases, volumes, and .env
+make backup
+
+# Restore from a specific backup
+make restore BACKUP=backups/klyvra-YYYYMMDD-HHMMSS</code></pre>
+        <p>Run backups daily and copy the archive to offsite storage.</p>
+
+        <h2>Upgrading</h2>
+        <pre><code># Docker Compose: pull latest images, rebuild, restart
+make upgrade
+
+# Kubernetes
+helm upgrade klyvra ./chart/klyvra</code></pre>
+
+        <div class="callout callout-warn">
+          <strong>⚠️ Always back up before upgrading</strong>
+          Run <code>make backup</code> before <code>make upgrade</code>. If something breaks, restore with <code>make restore BACKUP=path</code>.
+        </div>
+
+        <h2>Security Hardening</h2>
+        <p>Klyvra's Caddy reverse proxy injects security headers on all responses automatically:</p>
+        <ul>
+          <li><strong>Strict-Transport-Security</strong> (HSTS) — forces HTTPS for 1 year (production mode)</li>
+          <li><strong>X-Content-Type-Options</strong> — prevents MIME-type sniffing</li>
+          <li><strong>X-Frame-Options</strong> — restricts iframe embedding to same-origin</li>
+          <li><strong>Referrer-Policy</strong> — limits referrer information to external sites</li>
+          <li><strong>Permissions-Policy</strong> — disables camera, microphone, geolocation</li>
+        </ul>
+
+        <h3>Additional measures</h3>
+        <ul>
+          <li>Restrict Authentik admin access to specific IPs via Caddy/Ingress rules</li>
+          <li>Keep management ports (MinIO console 9001) internal or behind VPN</li>
+          <li>On Kubernetes, enable <code>global.networkPolicies.enabled</code> for pod-to-pod isolation</li>
+        </ul>
+
+        <h2>Monitoring</h2>
+        <pre><code>make status         # Container status dashboard
+make healthcheck    # HTTP check on all 13 routes
+make smoke-test     # Automated E2E verification
+make logs SVC=x     # Follow logs for a specific service</code></pre>
+
+        <p>Test email deliverability with <a href="https://www.mail-tester.com/">mail-tester.com</a> or <a href="https://mxtoolbox.com/">mxtoolbox.com</a>. Aim for 8/10 or higher.</p>
+      </div>
+
+      <!-- COMMUNICATIONS FRONT DOOR -->
+      <div id="page-comms" class="doc-page">
+        <h1>Communications Front Door</h1>
+        <p class="subtitle">Unified mail, calendar, and contacts access via Mattermost and dedicated subdomains.</p>
+
+        <h2>What It Is</h2>
+        <p>Klyvra provides a "communications front door" — dedicated subdomains and Mattermost slash commands that give users quick access to email, calendar, and contacts without needing to remember separate URLs.</p>
+
+        <h2>Subdomain Routes</h2>
+        <table>
+          <tr><th>URL</th><th>Default Target</th><th>Env Variable</th></tr>
+          <tr><td><code>http://mail.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>MAIL_URL</code></td></tr>
+          <tr><td><code>http://calendar.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>CALENDAR_URL</code></td></tr>
+          <tr><td><code>http://contacts.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>CONTACTS_URL</code></td></tr>
+        </table>
+        <p>By default, these routes point to Stalwart's web UI. Set <code>MAIL_URL</code>, <code>CALENDAR_URL</code>, and <code>CONTACTS_URL</code> to redirect to an external groupware backend (e.g., Roundcube, SOGo).</p>
+
+        <h2>Mattermost Slash Commands</h2>
+        <p>When <code>ENABLE_COMMS_COMMANDS=true</code> (default), Mattermost init creates these slash commands:</p>
+        <table>
+          <tr><th>Command</th><th>Action</th></tr>
+          <tr><td><code>/comms mail</code></td><td>Opens the mail URL</td></tr>
+          <tr><td><code>/comms calendar</code></td><td>Opens the calendar URL</td></tr>
+          <tr><td><code>/comms contacts</code></td><td>Opens the contacts URL</td></tr>
+          <tr><td><code>/mail</code></td><td>Shortcut — opens mail directly</td></tr>
+          <tr><td><code>/calendar</code></td><td>Shortcut — opens calendar directly</td></tr>
+          <tr><td><code>/contacts</code></td><td>Shortcut — opens contacts directly</td></tr>
+        </table>
+
+        <h2>Onboarding DM</h2>
+        <p>When <code>ENABLE_COMMS_ONBOARDING=true</code> (default), new users receive a one-time direct message in Mattermost after their first Authentik login. The DM contains links to mail, calendar, and contacts.</p>
+
+        <h2>Configuration</h2>
+        <table>
+          <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+          <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Create slash commands on bootstrap</td></tr>
+          <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Send welcome DM with comms links</td></tr>
+          <tr><td><code>MAIL_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for mail route/command</td></tr>
+          <tr><td><code>CALENDAR_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for calendar route/command</td></tr>
+          <tr><td><code>CONTACTS_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for contacts route/command</td></tr>
+        </table>
+
+        <div class="callout callout-tip">
+          <strong>💡 Custom groupware backend</strong>
+          If you use an external webmail client like Roundcube or SOGo, set the URL variables to point there. The slash commands and subdomain routes will redirect accordingly.
+        </div>
+      </div>
+
       <!-- MAKEFILE REFERENCE -->
       <div id="page-makefile-ref" class="doc-page">
         <h1>Makefile Commands</h1>
@@ -1010,7 +1195,7 @@ docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>
           <tr><td><code>make start</code> / <code>make stop</code></td><td>Start/stop without rebuilding</td></tr>
           <tr><td><code>make healthcheck</code></td><td>Quick HTTP check on all routes</td></tr>
           <tr><td><code>make test</code></td><td>Run 149 adapter unit tests</td></tr>
-          <tr><td><code>make verify</code></td><td>Run full verification suite (97 checks)</td></tr>
+          <tr><td><code>make verify</code></td><td>Run full verification suite (98 checks)</td></tr>
           <tr><td><code>make logs [SVC=x]</code></td><td>Follow container logs (all or specific)</td></tr>
           <tr><td><code>make restart [SVC=x]</code></td><td>Restart services (all or specific)</td></tr>
           <tr><td><code>make status</code></td><td>Container status dashboard</td></tr>

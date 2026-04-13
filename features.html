@@ -168,35 +168,59 @@
       background: linear-gradient(170deg, #EDF3FF 0%, #E0FFF4 100%);
       padding: 5rem 2rem;
     }
-    .cta-banner h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.75rem; }
-    .cta-banner p { color: var(--gray); font-size: 1.1rem; margin-bottom: 2rem; max-width: 550px; margin-left: auto; margin-right: auto; }
-    .cta-banner .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 
-    /* FOOTER */
-    footer {
-      background: var(--dark); color: rgba(255,255,255,0.5); padding: 3rem 2rem;
-      text-align: center;
+    /* COMPARISON TABLE */
+    .comparison-table-wrapper {
+      margin-top: 3rem; background: rgba(255,255,255,0.03); 
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+      overflow-x: auto;
     }
-    footer img { height: 32px; margin-bottom: 1rem; opacity: 0.8; }
-    footer p { font-size: 0.9rem; }
-    footer a { color: var(--teal); text-decoration: none; }
+    .comparison-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .comparison-table th, .comparison-table td {
+      padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.95rem;
+    }
+    .comparison-table th { font-weight: 600; font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+    .comparison-table td:first-child { color: var(--white); font-weight: 500; }
+    .comparison-table .klyvra-col { background: rgba(62,205,165,0.05); }
+    .comparison-table th.klyvra-col { background: rgba(62,205,165,0.1); color: var(--teal); border-top-left-radius: 12px; border-top-right-radius: 12px; }
+    .icon-check { color: var(--teal); font-weight: bold; }
+    .icon-cross { color: rgba(255,255,255,0.3); }
 
-    /* NAV SCROLL BEHAVIOR */
-    nav { transition: transform 0.3s ease; }
-    nav.nav-hidden { transform: translateY(-100%); }
+    /* TCO GRID */
+    .tco-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem;
+    }
+    .tco-card {
+      background: var(--white); border: 1px solid rgba(15,27,61,0.08); border-radius: 16px;
+      padding: 2.5rem 2rem; text-align: center;
+      box-shadow: 0 4px 24px rgba(15,27,61,0.04); transition: transform 0.2s;
+    }
+    .tco-card.highlight {
+      border: 2px solid var(--teal); transform: scale(1.05); box-shadow: 0 8px 32px rgba(62,205,165,0.15);
+      z-index: 2;
+    }
+    .tco-card h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--navy); }
+    .tco-card .price { font-size: 2.2rem; font-weight: 800; margin: 1rem 0; color: var(--navy); }
+    .tco-card .price span { font-size: 0.9rem; font-weight: 500; color: var(--gray); }
+    .tco-card .calc { font-size: 1rem; color: var(--gray); margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(15,27,61,0.08); }
+    .tco-card .total { font-size: 1.8rem; font-weight: 800; color: var(--blue); }
+    .tco-card.highlight .total { color: var(--teal); }
+    .tco-card .context { font-size: 0.85rem; color: var(--gray); margin-top: 0.5rem; }
 
-    /* HAMBURGER */
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px; cursor: pointer;
-      background: none; border: none; padding: 4px; z-index: 10000; position: relative;
+    /* COMPLIANCE CHECKLIST */
+    .compliance-card {
+      background: var(--white); border: 1px solid rgba(15,27,61,0.06); border-radius: 12px;
+      padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem;
+      box-shadow: 0 2px 12px rgba(15,27,61,0.02);
     }
-    .hamburger span {
-      display: block; width: 24px; height: 2px; background: var(--navy);
-      border-radius: 2px; transition: transform 0.3s, opacity 0.3s;
+    .compliance-card .check-icon {
+      display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;
+      background: rgba(62,205,165,0.15); color: #1a9e78; border-radius: 50%;
+      font-weight: bold; flex-shrink: 0; font-size: 0.8rem; margin-top: 2px;
     }
-    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
-    .hamburger.active span:nth-child(2) { opacity: 0; }
-    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    .compliance-card h3 { font-size: 1.05rem; font-weight: 600; color: var(--navy); margin-bottom: 0.25rem; }
+    .compliance-card p { font-size: 0.9rem; color: var(--gray); line-height: 1.5; margin: 0; }
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
@@ -204,6 +228,9 @@
       .feature-block { grid-template-columns: 1fr; gap: 2rem; }
       .feature-block.reverse { direction: ltr; }
       .stats { grid-template-columns: repeat(2, 1fr); }
+      .tco-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .tco-card.highlight { transform: none; border: 2px solid var(--teal); }
+      .comparison-table-wrapper { overflow-x: auto; }
 
       .hamburger { display: flex; }
       nav .links {
@@ -504,6 +531,224 @@
             <div style="margin-top:0.5rem; color:var(--gray);">Configure your mail client:</div>
             <div>IMAP: <span style="color:var(--teal);">groupware.company.com:993</span></div>
             <div>SMTP: <span style="color:var(--teal);">groupware.company.com:465</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON TABLE -->
+  <section class="dark-bg" id="comparison">
+    <div class="container fade-in">
+      <div class="section-title">
+        <h2>Enterprise Features, Community Values</h2>
+        <p>How Klyvra stacks up against the incumbents.</p>
+      </div>
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th class="klyvra-col">Klyvra</th>
+              <th>Google Workspace</th>
+              <th>Microsoft 365</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SSO & Identity</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Built-in (Authentik)</td>
+              <td><span class="icon-check">✓</span> Included</td>
+              <td><span class="icon-check">✓</span> Included (Entra)</td>
+            </tr>
+            <tr>
+              <td>File Storage & Sync</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Seafile</td>
+              <td><span class="icon-check">✓</span> Google Drive</td>
+              <td><span class="icon-check">✓</span> OneDrive / SharePoint</td>
+            </tr>
+            <tr>
+              <td>Email & Calendar</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Stalwart</td>
+              <td><span class="icon-check">✓</span> Gmail</td>
+              <td><span class="icon-check">✓</span> Exchange / Outlook</td>
+            </tr>
+            <tr>
+              <td>Chat & Video</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Mattermost</td>
+              <td><span class="icon-check">✓</span> Google Chat/Meet</td>
+              <td><span class="icon-check">✓</span> Microsoft Teams</td>
+            </tr>
+            <tr>
+              <td>Wiki & Docs</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Outline</td>
+              <td><span class="icon-check">✓</span> Google Docs</td>
+              <td><span class="icon-check">✓</span> SharePoint / OneNote</td>
+            </tr>
+            <tr>
+              <td>Git Hosting & CI</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Gitea</td>
+              <td><span class="icon-cross">✗ Extra cost / Third-party</span></td>
+              <td><span class="icon-cross">✗ Extra cost (GitHub)</span></td>
+            </tr>
+            <tr>
+              <td>Time Tracking</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Kimai</td>
+              <td><span class="icon-cross">✗ Not included</span></td>
+              <td><span class="icon-cross">✗ Not included</span></td>
+            </tr>
+            <tr>
+              <td>Task Management</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Vikunja</td>
+              <td><span class="icon-check">✓</span> Google Tasks</td>
+              <td><span class="icon-check">✓</span> Microsoft Planner</td>
+            </tr>
+            <tr>
+              <td>Password Manager</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Vaultwarden</td>
+              <td><span class="icon-cross">✗ Basic browser sync only</span></td>
+              <td><span class="icon-cross">✗ Basic sync only</span></td>
+            </tr>
+            <tr>
+              <td>Office Documents</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> OnlyOffice</td>
+              <td><span class="icon-check">✓</span> Google Workspace</td>
+              <td><span class="icon-check">✓</span> Office 365</td>
+            </tr>
+            <tr>
+              <td>Per-user Cost</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> €0 forever</td>
+              <td><span class="icon-cross">✗ ~€11.50/mo</span></td>
+              <td><span class="icon-cross">✗ ~€11.70/mo</span></td>
+            </tr>
+            <tr>
+              <td>Data Sovereignty</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Your infrastructure</td>
+              <td><span class="icon-cross">✗ US Cloud Act exposure</span></td>
+              <td><span class="icon-cross">✗ US Cloud Act exposure</span></td>
+            </tr>
+            <tr>
+              <td>Open Source (Auditable)</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> 100% FOSS</td>
+              <td><span class="icon-cross">✗ Closed source</span></td>
+              <td><span class="icon-cross">✗ Closed source</span></td>
+            </tr>
+            <tr>
+              <td>GDPR Compliance</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Full control</td>
+              <td><span class="icon-check">✓</span> Standard</td>
+              <td><span class="icon-check">✓</span> Standard</td>
+            </tr>
+            <tr>
+              <td>Deployment Control</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Docker / Kubernetes</td>
+              <td><span class="icon-cross">✗ SaaS only</span></td>
+              <td><span class="icon-cross">✗ SaaS only</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TCO / ROI SECTION -->
+  <section id="tco">
+    <div class="container fade-in">
+      <div class="section-title">
+        <h2>Stop Paying Per Seat</h2>
+        <p>Why rent your infrastructure when you can own it? Let's look at the numbers for a typical 25-person company.</p>
+      </div>
+      <div class="tco-grid">
+        <div class="tco-card">
+          <h3>Google Workspace</h3>
+          <div class="context">Business Standard Plan</div>
+          <div class="price">€11.50 <span>/ user / mo</span></div>
+          <div class="calc">25 users × 12 months</div>
+          <div class="total">€3,450</div>
+          <div class="context">per year</div>
+        </div>
+        <div class="tco-card highlight">
+          <h3>Klyvra</h3>
+          <div class="context">Unlimited Users</div>
+          <div class="price">€0 <span>/ user / mo</span></div>
+          <div class="calc">Estimated VPS Hosting (~€40/mo)</div>
+          <div class="total">€480</div>
+          <div class="context">per year</div>
+        </div>
+        <div class="tco-card">
+          <h3>Microsoft 365</h3>
+          <div class="context">Business Standard Plan</div>
+          <div class="price">€11.70 <span>/ user / mo</span></div>
+          <div class="calc">25 users × 12 months</div>
+          <div class="total">€3,510</div>
+          <div class="context">per year</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLIANCE CHECKLIST -->
+  <section class="alt-bg" id="compliance">
+    <div class="container fade-in">
+      <div class="section-title">
+        <h2>Compliance by Architecture</h2>
+        <p>Built for European digital sovereignty from day one.</p>
+      </div>
+      <div class="scenario-grid">
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>Your Infrastructure</h3>
+            <p>Deploy on bare metal, Hetzner, OVH, or your own local racks.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>No US CLOUD Act</h3>
+            <p>Keep your data completely shielded from foreign jurisdiction requests.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>Full GDPR Compliance</h3>
+            <p>You control where the data lives and who has access, simplifying audits.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>Audit Trail via Authentik</h3>
+            <p>Centralized logging of every authentication event across your entire stack.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>No Vendor Lock-in</h3>
+            <p>Standard formats and APIs. Your data is yours to export whenever you want.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>Open Source & Auditable</h3>
+            <p>No black-box SaaS. Every component's source code can be reviewed.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>No Per-User Licensing</h3>
+            <p>Scale your team without hitting arbitrary paywalls or subscription tiers.</p>
+          </div>
+        </div>
+        <div class="compliance-card">
+          <div class="check-icon">✓</div>
+          <div>
+            <h3>EU Sovereign Cloud Compatible</h3>
+            <p>Runs on any EU sovereign cloud provider — Hetzner, OVH, IONOS, or your own infrastructure.</p>
           </div>
         </div>
       </div>
