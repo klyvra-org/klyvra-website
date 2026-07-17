@@ -348,7 +348,7 @@
         <ul>
           <li>Docker Engine ≥ 24.0 with Compose v2 (Docker Desktop works too)</li>
           <li><code>openssl</code> and <code>make</code> (pre-installed on most Linux/macOS systems)</li>
-          <li>8 GB RAM minimum — all 10 apps plus their databases run simultaneously</li>
+          <li>8 GB RAM minimum — all 11 apps plus their databases run simultaneously</li>
           <li>Port 80 free (or choose another port — see below)</li>
         </ul>
 
@@ -367,7 +367,7 @@
 
         <h3><span class="step-number">3</span> Start everything</h3>
         <pre><code>make up</code></pre>
-        <p>This builds custom images, starts 35 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
+        <p>This builds custom images, starts 36 containers, waits for health checks, and runs init containers. Takes about 2–3 minutes on first run.</p>
 
         <h2>What You Get</h2>
         <p>When <code>make up</code> finishes, these URLs are live:</p>
@@ -382,8 +382,9 @@
           <tr><td>Kimai</td><td><a href="http://time.localhost">time.localhost</a></td><td>Time tracking</td></tr>
           <tr><td>Vikunja</td><td><a href="http://tasks.localhost">tasks.localhost</a></td><td>Task management</td></tr>
           <tr><td>Vaultwarden</td><td><a href="http://vault.localhost">vault.localhost</a></td><td>Password manager</td></tr>
-          <tr><td>Stalwart</td><td><a href="http://groupware.localhost">groupware.localhost</a></td><td>Email, calendar, contacts</td></tr>
           <tr><td>OnlyOffice</td><td><a href="http://office.localhost">office.localhost</a></td><td>Document editing</td></tr>
+          <tr><td>Paperless</td><td><a href="http://dms.localhost">dms.localhost</a></td><td>Document management (OCR)</td></tr>
+          <tr><td>Whiteboard</td><td><a href="http://draw.localhost">draw.localhost</a></td><td>Excalidraw, gated by SSO</td></tr>
         </table>
 
         <div class="callout callout-info">
@@ -414,8 +415,8 @@
         <h2><span class="step-number">2</span> Explore the Admin Panel</h2>
         <p>After creating your account, go to <a href="http://auth.localhost/if/admin/">http://auth.localhost/if/admin/</a>. You'll see:</p>
         <ul>
-          <li>Applications — all 10 apps are pre-configured</li>
-          <li>Providers — 7 OIDC + 1 SAML provider, all wired up</li>
+          <li>Applications — all 11 apps are pre-configured</li>
+          <li>Providers — 8 OIDC/OAuth + 1 SAML + 1 proxy provider, all wired up</li>
           <li>Users — just your admin account so far</li>
           <li>Groups — ready for you to create your company's structure</li>
         </ul>
@@ -423,13 +424,15 @@
         <h2><span class="step-number">3</span> Log Into an App</h2>
         <p>Go to any app URL, for example <a href="http://docs.localhost">docs.localhost</a> (Outline). You'll see a login page with an SSO button:</p>
         <ul>
-          <li>Outline → "Continue with Klyvra"</li>
+          <li>Outline → auto-redirects straight through Klyvra SSO</li>
           <li>Mattermost → "Login with Klyvra"</li>
           <li>Gitea → "Sign in with Klyvra"</li>
           <li>Seafile → "Single Sign-On"</li>
           <li>Kimai → "Login with Klyvra"</li>
           <li>Vikunja → "Klyvra"</li>
           <li>Vaultwarden → "Enterprise Single Sign-On" (enter any email → SSO redirects to Authentik)</li>
+          <li>Paperless → "Klyvra"</li>
+          <li>Whiteboard → no button — forward-auth redirects unauthenticated visitors to Authentik automatically</li>
         </ul>
         <p>Click the SSO button → you're redirected to Authentik → log in → redirected back to the app, logged in. That's the flow for all apps.</p>
 
@@ -443,13 +446,16 @@
           The very first user to log into Outline automatically becomes the workspace admin. Make sure the person who sets up the stack logs into Outline first — not a regular user. If the wrong person logs in first, you'll need to manually adjust admin status via the Outline API.
         </div>
 
-        <h2><span class="step-number">4</span> Stalwart Mail</h2>
-        <p>Stalwart is slightly different — mailboxes are created automatically on first SSO login (JIT provisioning). After logging in at <a href="http://groupware.localhost">groupware.localhost</a>, your mailbox is ready for IMAP/SMTP at:</p>
+        <h2><span class="step-number">4</span> Documents &amp; Whiteboard</h2>
+        <p>Two apps behave a little differently:</p>
         <ul>
-          <li>IMAP: <code>groupware.localhost:143</code></li>
-          <li>SMTP: <code>groupware.localhost:587</code></li>
-          <li>Username: your Authentik email</li>
+          <li><strong>Paperless</strong> (<a href="http://dms.localhost">dms.localhost</a>) — click "Klyvra" to sign in; your account is created on first login. A local <code>admin</code> account also exists (password in <code>.env</code> as <code>PAPERLESS_ADMIN_PASSWORD</code>) for superuser tasks.</li>
+          <li><strong>Whiteboard</strong> (<a href="http://draw.localhost">draw.localhost</a>) — there is no login page at all. Caddy checks your Authentik session before proxying; visitors without one are redirected to log in first.</li>
         </ul>
+        <div class="callout callout-info">
+          <strong>ℹ️ Email</strong>
+          Klyvra doesn't self-host email (deliverability makes it impossible to ship turnkey). Set <code>MAIL_URL</code>, <code>CALENDAR_URL</code>, and <code>CONTACTS_URL</code> in <code>.env</code> to your hosted provider — the <code>mail.*</code>/<code>calendar.*</code>/<code>contacts.*</code> routes and Mattermost slash commands will link straight to it.
+        </div>
 
         <h2><span class="step-number">5</span> What's Next</h2>
         <p>Now that you can log in, the next step is setting up your company's group structure:</p>
@@ -468,14 +474,13 @@
         <p>Klyvra uses a hub-and-spoke model for access control:</p>
         <ol>
           <li>You create a group in Authentik (e.g., "engineering")</li>
-          <li>Authentik fires a webhook to all 5 adapters</li>
+          <li>Authentik fires a webhook to all 4 adapters</li>
           <li>Each adapter creates the matching resource in its app:
             <ul>
               <li>Gitea → creates an organization</li>
               <li>Mattermost → creates a channel</li>
               <li>Outline → creates a group (for collection permissions)</li>
               <li>Seafile → creates a group (for library sharing)</li>
-              <li>Stalwart → creates a mailing list</li>
             </ul>
           </li>
           <li>When you add a user to the group, adapters sync membership</li>
@@ -502,7 +507,6 @@ ROLE_MAPPING='{"engineering": "owner", "management": "read", "hr": null}'</code>
           <tr><td>Outline</td><td><code>member</code></td><td><code>member</code></td></tr>
           <tr><td>Seafile</td><td><code>member</code></td><td><code>member</code></td></tr>
           <tr><td>Kimai</td><td><code>super_admin</code> · <code>teamlead</code> · <code>user</code></td><td>Mapped via SAML groups</td></tr>
-          <tr><td>Stalwart</td><td><code>member</code></td><td><code>member</code> (mailing list)</td></tr>
         </table>
 
         <h2>The null Role (Exclusion)</h2>
@@ -525,7 +529,6 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
         mattermost: member     # Channel member
         seafile: member        # File access
         kimai: user            # Track own time
-        stalwart: member       # Mailing list
 
     management:
       displayName: "Management"
@@ -543,7 +546,6 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
         outline: member        # Wiki read/write
         seafile: member        # File access
         kimai: teamlead        # Approve timesheets
-        stalwart: member       # Mailing list</code></pre>
 
         <p>The chart automatically converts this into per-adapter <code>ROLE_MAPPING</code> ConfigMaps.</p>
 
@@ -574,14 +576,16 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
                  ├── time.*      → Kimai        (SAML)
                  ├── tasks.*     → Vikunja      (OIDC)
                  ├── vault.*     → Vaultwarden  (OIDC)
-                  ├── groupware.*  → Stalwart     (OIDC)
                  ├── office.*    → OnlyOffice   (JWT)
+                 ├── dms.*       → Paperless    (OIDC)
+                 ├── draw.*      → Excalidraw   (forward-auth)
                  └── minio.*     → MinIO        (internal)</code></pre>
 
         <h2>Authentication Protocols</h2>
         <table>
           <tr><th>App</th><th>Protocol</th><th>Notes</th></tr>
-          <tr><td>Outline, Gitea, Vikunja, Vaultwarden, Stalwart</td><td>OIDC</td><td>Standard OpenID Connect</td></tr>
+          <tr><td>Outline, Gitea, Vikunja, Vaultwarden, Paperless</td><td>OIDC</td><td>Standard OpenID Connect</td></tr>
+          <tr><td>Whiteboard (Excalidraw)</td><td>Forward-auth</td><td>Caddy asks Authentik's embedded outpost before proxying</td></tr>
           <tr><td>Mattermost</td><td>OAuth2</td><td>Uses "GitLab" provider type (same protocol)</td></tr>
           <tr><td>Seafile</td><td>OAuth2</td><td>Custom OAuth via patched settings</td></tr>
           <tr><td>Kimai</td><td>SAML 2.0</td><td>Only external auth method Kimai supports</td></tr>
@@ -593,14 +597,13 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
         <p>There are 18 blueprints in <code>apps/authentik/blueprints/</code>: one per OIDC/SAML provider, one per webhook transport, plus shared scope and comms launcher configs.</p>
 
         <h2>Adapters</h2>
-        <p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 5 adapters:</p>
+        <p>Adapters are lightweight FastAPI microservices that receive Authentik webhooks and translate them into app-specific API calls. There are 4 adapters:</p>
         <table>
           <tr><th>Adapter</th><th>Receives</th><th>Creates</th></tr>
           <tr><td>outline-adapter</td><td>Group CRUD, user login</td><td>Outline groups + membership</td></tr>
           <tr><td>mattermost-adapter</td><td>Group CRUD, user login</td><td>Channels + membership + slash commands</td></tr>
           <tr><td>gitea-adapter</td><td>Group CRUD, user login</td><td>Organizations + team membership</td></tr>
           <tr><td>seafile-adapter</td><td>Group CRUD, user login</td><td>Groups + library sharing + membership</td></tr>
-          <tr><td>stalwart-adapter</td><td>Group CRUD, user login</td><td>Mailing lists + JIT mailbox provisioning</td></tr>
         </table>
 
         <h2>Init Containers</h2>
@@ -611,7 +614,6 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
           <tr><td>mattermost-init</td><td>Creates team + bot token + slash commands</td></tr>
           <tr><td>gitea-init</td><td>Registers OIDC auth source + service account</td></tr>
           <tr><td>kimai-init</td><td>Fetches SAML signing cert, generates config</td></tr>
-          <tr><td>stalwart-init</td><td>Creates mail domain via REST API</td></tr>
           <tr><td>minio-init</td><td>Creates S3 bucket for Outline</td></tr>
         </table>
 
@@ -636,16 +638,15 @@ ROLE_MAPPING='{"engineering": null}'  # on the Kimai adapter (if applicable)</co
     ├──webhook──→ outline-adapter ──API──→ Outline
     ├──webhook──→ mattermost-adapter ──API──→ Mattermost
     ├──webhook──→ gitea-adapter ──API──→ Gitea
-    ├──webhook──→ seafile-adapter ──API──→ Seafile
-    └──webhook──→ stalwart-adapter ──API──→ Stalwart</code></pre>
+    └──webhook──→ seafile-adapter ──API──→ Seafile</code></pre>
 
         <h2>Webhook Events</h2>
         <table>
           <tr><th>Event</th><th>Trigger</th><th>Adapter Action</th></tr>
-          <tr><td><code>model_created</code> (group)</td><td>New group created in Authentik</td><td>Create org/channel/group/mailing list</td></tr>
+          <tr><td><code>model_created</code> (group)</td><td>New group created in Authentik</td><td>Create org/channel/group</td></tr>
           <tr><td><code>model_updated</code> (group)</td><td>Group membership changed</td><td>Sync membership to app</td></tr>
           <tr><td><code>model_deleted</code> (group)</td><td>Group deleted</td><td>Delete corresponding resource</td></tr>
-          <tr><td><code>user_login</code></td><td>User logs into any app</td><td>Apply pending memberships, JIT mailbox</td></tr>
+          <tr><td><code>user_login</code></td><td>User logs into any app</td><td>Apply pending memberships, join default team</td></tr>
         </table>
 
         <h2>Pending Queue</h2>
@@ -688,13 +689,12 @@ GET  /pending    — Lists queued pending operations</code></pre>
           <li>Enter the group name (e.g., <code>engineering</code>)</li>
           <li>Click <strong>Create</strong></li>
         </ol>
-        <p>Within seconds, all 5 adapters receive a webhook and create the corresponding resources:</p>
+        <p>Within seconds, all 4 adapters receive a webhook and create the corresponding resources:</p>
         <ul>
           <li>Gitea: organization <code>engineering</code></li>
           <li>Mattermost: channel <code>engineering</code></li>
           <li>Outline: group <code>engineering</code></li>
           <li>Seafile: group <code>engineering</code></li>
-          <li>Stalwart: mailing list <code>engineering@yourdomain.com</code></li>
         </ul>
 
         <h2><span class="step-number">3</span> Create Users</h2>
@@ -723,8 +723,7 @@ GET  /pending    — Lists queued pending operations</code></pre>
         <p>Share the app URLs with your users. On first login to any app via SSO:</p>
         <ol>
           <li>A local account is auto-created in the app</li>
-          <li>All pending group memberships are applied</li>
-          <li>If Stalwart is enabled, a mailbox is auto-provisioned</li>
+          <li>All pending group memberships are applied (Mattermost also joins them to the default team)</li>
           <li>If Mattermost onboarding is enabled, they get a welcome DM with communication links</li>
         </ol>
       </div>
@@ -788,7 +787,7 @@ make up</code></pre>
         <h2>DNS Setup</h2>
         <p>Point a wildcard DNS record to your server:</p>
         <pre><code>*.company.com    A    → your-server-ip</code></pre>
-        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>groupware</code>, <code>office</code>, <code>mail</code>, <code>calendar</code>, <code>contacts</code>.</p>
+        <p>Or create individual A records for each subdomain: <code>auth</code>, <code>docs</code>, <code>chat</code>, <code>git</code>, <code>files</code>, <code>time</code>, <code>tasks</code>, <code>vault</code>, <code>office</code>, <code>dms</code>, <code>draw</code>, <code>mail</code>, <code>calendar</code>, <code>contacts</code>.</p>
 
         <h2>TLS (HTTPS)</h2>
         <p>TLS is fully automated when using a custom domain:</p>
@@ -827,7 +826,7 @@ make up</code></pre>
         </ul>
 
         <h2>Build & Push Images</h2>
-        <p>Klyvra uses 10 custom images (adapters, init jobs, custom Stalwart/Seafile). Build and push them to your registry:</p>
+        <p>Klyvra builds custom images for the adapters, init jobs, and Seafile (embedded OAuth boot). Build and push them to your registry:</p>
         <pre><code># Build locally
 make images
 
@@ -852,7 +851,6 @@ REGISTRY=ghcr.io/your-org TAG=v0.1.0 make push-images</code></pre>
         mattermost: member
         seafile: member
         kimai: user
-        stalwart: member
 
     management:
       displayName: "Management"
@@ -882,7 +880,7 @@ kimai:
   enabled: false     # Don't need time tracking? Disable it.</code></pre>
 
         <h2>Ingress</h2>
-        <p>The chart creates Ingress resources for all 11 subdomains. Configure your ingress class:</p>
+        <p>The chart creates Ingress resources for every enabled app's subdomain. Configure your ingress class:</p>
         <pre><code>global:
   ingress:
     className: nginx
@@ -898,7 +896,7 @@ kimai:
       <!-- APP REFERENCE -->
       <div id="page-apps-ref" class="doc-page">
         <h1>App Reference</h1>
-        <p class="subtitle">All 10 apps at a glance — what they do, how they authenticate, and what they replace.</p>
+        <p class="subtitle">All 11 apps at a glance — what they do, how they authenticate, and what they replace.</p>
 
         <table>
           <tr><th>App</th><th>Subdomain</th><th>Auth</th><th>Replaces</th><th>Group Sync</th></tr>
@@ -911,7 +909,8 @@ kimai:
           <tr><td>Vikunja</td><td>tasks.*</td><td>OIDC</td><td>Asana, Trello</td><td>SSO only</td></tr>
           <tr><td>Vaultwarden</td><td>vault.*</td><td>OIDC</td><td>1Password, LastPass</td><td>SSO only</td></tr>
           <tr><td>OnlyOffice</td><td>office.*</td><td>JWT</td><td>Google Docs, MS Office</td><td>No accounts</td></tr>
-          <tr><td>Stalwart</td><td>groupware.*</td><td>OIDC</td><td>Gmail, Exchange</td><td>✓ Adapter</td></tr>
+          <tr><td>Paperless-ngx</td><td>dms.*</td><td>OIDC</td><td>DocuWare, paper archives</td><td>SSO only</td></tr>
+          <tr><td>Excalidraw</td><td>draw.*</td><td>Forward-auth</td><td>Miro, FigJam</td><td>Any authenticated user</td></tr>
           <tr><td>MinIO</td><td>minio.*</td><td>Internal</td><td>AWS S3</td><td>No accounts</td></tr>
         </table>
 
@@ -939,20 +938,20 @@ kimai:
           <tr><td><code>MATTERMOST_TEAM_NAME</code></td><td><code>main</code></td><td>Default Mattermost team name</td></tr>
           <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Create /comms, /mail, /calendar slash commands</td></tr>
           <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Send welcome DM with comms links on first login</td></tr>
-          <tr><td><code>MAIL_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for mail redirect</td></tr>
-          <tr><td><code>CALENDAR_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for calendar redirect</td></tr>
-          <tr><td><code>CONTACTS_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target URL for contacts redirect</td></tr>
+          <tr><td><code>MAIL_URL</code></td><td><em>(empty)</em></td><td>Your hosted mail provider — front-door page explains setup until set</td></tr>
+          <tr><td><code>CALENDAR_URL</code></td><td><em>(empty)</em></td><td>Your hosted calendar provider — front-door page explains setup until set</td></tr>
+          <tr><td><code>CONTACTS_URL</code></td><td><em>(empty)</em></td><td>Your hosted contacts provider — front-door page explains setup until set</td></tr>
         </table>
 
         <h2>Auto-Generated (don't touch)</h2>
         <p><code>make bootstrap</code> generates 30+ secrets using <code>openssl rand</code>. These include:</p>
         <ul>
-          <li>Database passwords for all 7 databases</li>
+          <li>Database passwords for all 8 databases</li>
           <li>OIDC client secrets for all 7 OIDC providers</li>
           <li>Authentik secret key, bootstrap token</li>
           <li>MinIO root password</li>
           <li>OnlyOffice JWT secret</li>
-          <li>Stalwart admin password</li>
+          <li>Paperless admin password &amp; secret key</li>
         </ul>
 
         <div class="callout callout-warn">
@@ -981,7 +980,7 @@ make up             # clean start</code></pre>
         <pre><code># /etc/hosts
 127.0.0.1 auth.localhost docs.localhost chat.localhost git.localhost
 127.0.0.1 files.localhost time.localhost tasks.localhost vault.localhost
-127.0.0.1 groupware.localhost office.localhost minio.localhost</code></pre>
+127.0.0.1 dms.localhost draw.localhost office.localhost minio.localhost</code></pre>
 
         <h2>Service won't start</h2>
         <pre><code>docker compose logs &lt;service-name&gt;    # Check logs
@@ -1046,45 +1045,16 @@ docker compose exec outline-adapter curl -s localhost:8000/pending</code></pre>
           <tr><th>Port</th><th>Protocol</th><th>Service</th></tr>
           <tr><td>80</td><td>TCP</td><td>HTTP (Caddy redirect)</td></tr>
           <tr><td>443</td><td>TCP</td><td>HTTPS (Caddy reverse proxy)</td></tr>
-          <tr><td>25</td><td>TCP</td><td>SMTP (Stalwart)</td></tr>
-          <tr><td>587</td><td>TCP</td><td>SMTP Submission (Stalwart)</td></tr>
-          <tr><td>143</td><td>TCP</td><td>IMAP (Stalwart)</td></tr>
           <tr><td>2222</td><td>TCP</td><td>SSH (Gitea git clone)</td></tr>
         </table>
 
-        <h2>Email DNS Configuration</h2>
-        <p>For production email deliverability, configure these DNS records (replace <code>company.com</code> with your domain):</p>
-
-        <h3>Required records</h3>
-        <table>
-          <tr><th>Type</th><th>Host</th><th>Value</th><th>Purpose</th></tr>
-          <tr><td>MX</td><td><code>company.com</code></td><td><code>10 mail.company.com</code></td><td>Route inbound email</td></tr>
-          <tr><td>A</td><td><code>mail.company.com</code></td><td><code>&lt;your-server-ip&gt;</code></td><td>Mail server hostname</td></tr>
-          <tr><td>TXT</td><td><code>company.com</code></td><td><code>v=spf1 mx ~all</code></td><td>SPF: authorize server to send mail</td></tr>
-        </table>
-
-        <h3>DKIM setup</h3>
+        <h2>Email (Bring Your Own Provider)</h2>
+        <p>Klyvra does not self-host email — port 25 blocking, IP reputation, and SPF/DKIM/PTR coordination make it the one service that can't ship turnkey. Instead:</p>
         <ol>
-          <li>Access Stalwart admin at <code>https://groupware.company.com/admin/</code> (use <code>STALWART_ADMIN_PASSWORD</code> from <code>.env</code>)</li>
-          <li>Navigate to Settings → DKIM — Stalwart auto-generates DKIM keys on domain creation</li>
-          <li>Copy the public key and create a DNS TXT record at <code>default._domainkey.company.com</code></li>
+          <li>Choose a hosted provider (EU providers work well for data-sovereignty requirements)</li>
+          <li>Set <code>MAIL_URL</code>, <code>CALENDAR_URL</code>, and <code>CONTACTS_URL</code> in <code>.env</code> to its web endpoints</li>
+          <li><code>mail.company.com</code>, <code>calendar.company.com</code>, and <code>contacts.company.com</code> redirect there, and Mattermost's <code>/mail</code>, <code>/calendar</code>, <code>/contacts</code> commands link users directly</li>
         </ol>
-
-        <h3>DMARC</h3>
-        <pre><code>Type: TXT
-Host: _dmarc.company.com
-Value: v=DMARC1; p=quarantine; rua=mailto:admin@company.com; pct=100</code></pre>
-        <p>Start with <code>p=none</code> (monitor only) before switching to <code>p=quarantine</code> or <code>p=reject</code>.</p>
-
-        <h3>Reverse DNS (PTR)</h3>
-        <p>Contact your hosting provider to set the PTR record for your server's IP to <code>mail.company.com</code>. Many email providers reject mail from IPs without matching PTR records.</p>
-
-        <h3>Mail client autoconfiguration</h3>
-        <p>Klyvra serves autoconfig/autodiscover XML files automatically. Point these subdomains to your server:</p>
-        <ul>
-          <li><code>autoconfig.company.com</code> (Thunderbird)</li>
-          <li><code>autodiscover.company.com</code> (Outlook/iOS)</li>
-        </ul>
 
         <h2>Backup & Restore</h2>
         <pre><code># Back up all databases, volumes, and .env
@@ -1125,11 +1095,10 @@ helm upgrade klyvra ./chart/klyvra</code></pre>
 
         <h2>Monitoring</h2>
         <pre><code>make status         # Container status dashboard
-make healthcheck    # HTTP check on all 13 routes
+make healthcheck    # HTTP check on all 14 routes
 make smoke-test     # Automated E2E verification
 make logs SVC=x     # Follow logs for a specific service</code></pre>
 
-        <p>Test email deliverability with <a href="https://www.mail-tester.com/">mail-tester.com</a> or <a href="https://mxtoolbox.com/">mxtoolbox.com</a>. Aim for 8/10 or higher.</p>
       </div>
 
       <!-- COMMUNICATIONS FRONT DOOR -->
@@ -1143,11 +1112,11 @@ make logs SVC=x     # Follow logs for a specific service</code></pre>
         <h2>Subdomain Routes</h2>
         <table>
           <tr><th>URL</th><th>Default Target</th><th>Env Variable</th></tr>
-          <tr><td><code>http://mail.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>MAIL_URL</code></td></tr>
-          <tr><td><code>http://calendar.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>CALENDAR_URL</code></td></tr>
-          <tr><td><code>http://contacts.{DOMAIN}</code></td><td><code>groupware.{DOMAIN}</code></td><td><code>CONTACTS_URL</code></td></tr>
+          <tr><td><code>http://mail.{DOMAIN}</code></td><td><em>setup page until configured</em></td><td><code>MAIL_URL</code></td></tr>
+          <tr><td><code>http://calendar.{DOMAIN}</code></td><td><em>setup page until configured</em></td><td><code>CALENDAR_URL</code></td></tr>
+          <tr><td><code>http://contacts.{DOMAIN}</code></td><td><em>setup page until configured</em></td><td><code>CONTACTS_URL</code></td></tr>
         </table>
-        <p>By default, these routes point to Stalwart's web UI. Set <code>MAIL_URL</code>, <code>CALENDAR_URL</code>, and <code>CONTACTS_URL</code> to redirect to an external groupware backend (e.g., Roundcube, SOGo).</p>
+        <p>Until configured, these routes serve a small page explaining how to set them up. Set <code>MAIL_URL</code>, <code>CALENDAR_URL</code>, and <code>CONTACTS_URL</code> to your hosted provider and the routes redirect there directly.</p>
 
         <h2>Mattermost Slash Commands</h2>
         <p>When <code>ENABLE_COMMS_COMMANDS=true</code> (default), Mattermost init creates these slash commands:</p>
@@ -1169,13 +1138,13 @@ make logs SVC=x     # Follow logs for a specific service</code></pre>
           <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
           <tr><td><code>ENABLE_COMMS_COMMANDS</code></td><td><code>true</code></td><td>Create slash commands on bootstrap</td></tr>
           <tr><td><code>ENABLE_COMMS_ONBOARDING</code></td><td><code>true</code></td><td>Send welcome DM with comms links</td></tr>
-          <tr><td><code>MAIL_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for mail route/command</td></tr>
-          <tr><td><code>CALENDAR_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for calendar route/command</td></tr>
-          <tr><td><code>CONTACTS_URL</code></td><td><code>http://groupware.${DOMAIN}</code></td><td>Target for contacts route/command</td></tr>
+          <tr><td><code>MAIL_URL</code></td><td><em>(empty)</em></td><td>Your hosted mail provider</td></tr>
+          <tr><td><code>CALENDAR_URL</code></td><td><em>(empty)</em></td><td>Your hosted calendar provider</td></tr>
+          <tr><td><code>CONTACTS_URL</code></td><td><em>(empty)</em></td><td>Your hosted contacts provider</td></tr>
         </table>
 
         <div class="callout callout-tip">
-          <strong>💡 Custom groupware backend</strong>
+          <strong>💡 Point it at your provider</strong>
           If you use an external webmail client like Roundcube or SOGo, set the URL variables to point there. The slash commands and subdomain routes will redirect accordingly.
         </div>
       </div>

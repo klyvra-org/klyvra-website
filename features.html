@@ -318,10 +318,10 @@
       <div class="feature-block fade-in">
         <div class="feature-text">
           <div class="tag">Single Sign-On</div>
-          <h3>One Login. Ten Apps. Zero Friction.</h3>
-          <p>Your team logs in once through Authentik and gets immediate access to every tool — wiki, chat, code, files, tasks, email. No separate accounts, no password fatigue, no "which login was it again?"</p>
+          <h3>One Login. Eleven Apps. Zero Friction.</h3>
+          <p>Your team logs in once through Authentik and gets immediate access to every tool — wiki, chat, code, files, tasks, documents. No separate accounts, no password fatigue, no "which login was it again?"</p>
           <ul class="check-list">
-            <li>7 apps via OIDC, 1 via SAML — all pre-configured out of the box</li>
+            <li>9 apps via OIDC/OAuth, 1 via SAML, 1 gated by forward-auth — all pre-configured out of the box</li>
             <li>First login auto-creates the user's account in each app</li>
             <li>MFA support built into Authentik (TOTP, WebAuthn, Duo)</li>
             <li>Branding-ready login pages — your logo, your domain</li>
@@ -384,7 +384,7 @@
           <ul class="check-list">
             <li>18 Authentik blueprints auto-configure all SSO providers</li>
             <li>Init containers seed API keys, register auth sources, patch configs</li>
-            <li>5 webhook adapters keep app permissions in sync in real time</li>
+            <li>4 webhook adapters keep app permissions in sync in real time</li>
             <li>Fully idempotent — safe to restart, re-deploy, upgrade</li>
           </ul>
         </div>
@@ -396,8 +396,8 @@
             <div>cd klyvra</div>
             <div>make bootstrap DOMAIN=company.com</div>
             <div>make up</div>
-             <div style="margin-top:0.5rem; color:var(--teal);">✓ 35 containers running</div>
-            <div style="color:var(--teal);">✓ SSO configured for 10 apps</div>
+             <div style="margin-top:0.5rem; color:var(--teal);">✓ 36 containers running</div>
+            <div style="color:var(--teal);">✓ SSO configured for 11 apps</div>
             <div style="color:var(--teal);">✓ Webhooks armed, adapters listening</div>
             <div style="color:var(--teal);">✓ Ready at https://auth.company.com</div>
           </div>
@@ -451,7 +451,7 @@
         <div class="scenario-card fade-in">
           <div class="icon">🚀</div>
           <h3>Startup / Small Team</h3>
-          <p>Spin up a complete workspace in 5 minutes. Wiki, chat, code hosting, file sharing, passwords, email — all with one login. No per-seat costs eating your runway.</p>
+          <p>Spin up a complete workspace in 5 minutes. Wiki, chat, code hosting, file sharing, passwords, documents — all with one login. No per-seat costs eating your runway.</p>
         </div>
         <div class="scenario-card fade-in">
           <div class="icon">🏢</div>
@@ -489,10 +489,10 @@
         <div class="feature-text">
           <div class="tag">Webhook Adapters</div>
           <h3>Apps That Talk to Each Other.</h3>
-          <p>When you create a group in Authentik, five lightweight adapters instantly create the matching resources: a Gitea org, a Mattermost channel, an Outline group, a Seafile group, and a Stalwart mailing list. Add a user to the group and they're added everywhere. Remove the group and everything's cleaned up.</p>
+          <p>When you create a group in Authentik, four lightweight adapters instantly create the matching resources: a Gitea org, a Mattermost channel, an Outline group, and a Seafile group. Add a user to the group and they're added everywhere. Remove the group and everything's cleaned up.</p>
           <ul class="check-list">
             <li>Real-time sync — changes propagate in milliseconds</li>
-            <li>Stalwart auto-provisions mailboxes on first SSO login</li>
+            <li>First SSO login auto-joins users to their team and channels</li>
             <li>Pending queue for users who haven't logged in yet</li>
             <li>Each adapter is a tiny FastAPI service — easy to extend</li>
           </ul>
@@ -506,7 +506,6 @@
             <div>3. Mattermost → new channel <span style="color:var(--teal);">"engineering"</span></div>
             <div>4. Outline → new group <span style="color:var(--teal);">"engineering"</span></div>
             <div>5. Seafile → new group <span style="color:var(--teal);">"engineering"</span></div>
-            <div>6. Stalwart → mailing list <span style="color:var(--teal);">engineering@company.com</span></div>
             <div style="margin-top:0.5rem; color:var(--teal);">Done. Under 1 second.</div>
           </div>
         </div>
@@ -514,32 +513,30 @@
     </div>
   </section>
 
-  <!-- FEATURE 6: MAIL -->
-  <section class="alt-bg" id="mail">
+  <!-- FEATURE 6: DOCUMENTS & WHITEBOARD -->
+  <section class="alt-bg" id="documents">
     <div class="container">
       <div class="feature-block reverse fade-in">
         <div class="feature-text">
-          <div class="tag">Email & Groupware</div>
-          <h3>Mail, Calendar, Contacts. Self-Hosted.</h3>
-          <p>Stalwart gives your team full email, calendar (CalDAV), and contacts (CardDAV) — with mailboxes auto-created the moment someone logs in via SSO. Group mailing lists are created automatically when you create a group in Authentik.</p>
+          <div class="tag">Documents & Whiteboard</div>
+          <h3>Paper In. Ideas Out.</h3>
+          <p>Paperless-ngx turns contracts, invoices, and scans into a searchable, OCR-indexed archive — with SSO login like everything else. Excalidraw gives your team a sketching whiteboard, protected by Authentik forward-auth so only your people can reach it.</p>
           <ul class="check-list">
-            <li>IMAP + SMTP + CalDAV + CardDAV in one server</li>
-            <li>Mailboxes provisioned automatically on first SSO login</li>
-            <li>Group mailing lists synced from Authentik groups</li>
-            <li>Works with any mail client — Thunderbird, Apple Mail, mobile</li>
+            <li>OCR on every uploaded document — full-text searchable</li>
+            <li>Tags, correspondents, and retention workflows built in</li>
+            <li>Whiteboard requires zero setup — open draw.* and sketch</li>
+            <li>Email? Bring your own provider — Klyvra links it via the comms front door instead of running a fragile mail server</li>
           </ul>
         </div>
         <div class="feature-visual">
-          <div style="color:var(--gray); margin-bottom:0.75rem;">Auto-provisioned on login:</div>
+          <div style="color:var(--gray); margin-bottom:0.75rem;">Scan → searchable in seconds:</div>
           <div style="text-align:left; line-height:2;">
-            <div><span style="color:var(--teal);">alice@company.com</span> logs in via SSO</div>
-            <div style="color:var(--gray);">↓ webhook fires</div>
-            <div>📬 Mailbox created</div>
-            <div>📅 Calendar ready</div>
-            <div>👥 Added to <span style="color:var(--teal);">engineering@company.com</span> list</div>
-            <div style="margin-top:0.5rem; color:var(--gray);">Configure your mail client:</div>
-            <div>IMAP: <span style="color:var(--teal);">groupware.company.com:993</span></div>
-            <div>SMTP: <span style="color:var(--teal);">groupware.company.com:465</span></div>
+            <div>📄 <span style="color:var(--teal);">invoice-2026-042.pdf</span> uploaded</div>
+            <div style="color:var(--gray);">↓ OCR + auto-tagging</div>
+            <div>🏷 Tagged: <span style="color:var(--teal);">invoices · supplier-acme · 2026</span></div>
+            <div>🔍 Findable by any word inside the scan</div>
+            <div style="margin-top:0.5rem; color:var(--gray);">And next door:</div>
+            <div>✏️ <span style="color:var(--teal);">draw.company.com</span> — whiteboard behind SSO</div>
           </div>
         </div>
       </div>
@@ -578,9 +575,21 @@
             </tr>
             <tr>
               <td>Email & Calendar</td>
-              <td class="klyvra-col"><span class="icon-check">✓</span> Stalwart</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Your provider, integrated links</td>
               <td><span class="icon-check">✓</span> Gmail</td>
               <td><span class="icon-check">✓</span> Exchange / Outlook</td>
+            </tr>
+            <tr>
+              <td>Document Management (OCR)</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Paperless-ngx</td>
+              <td><span class="icon-cross">✗ Drive search only</span></td>
+              <td><span class="icon-cross">✗ SharePoint (extra setup)</span></td>
+            </tr>
+            <tr>
+              <td>Whiteboard</td>
+              <td class="klyvra-col"><span class="icon-check">✓</span> Excalidraw</td>
+              <td><span class="icon-cross">✗ Jamboard discontinued</span></td>
+              <td><span class="icon-check">✓</span> MS Whiteboard</td>
             </tr>
             <tr>
               <td>Chat & Video</td>
